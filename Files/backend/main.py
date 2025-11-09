@@ -94,20 +94,23 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
 
         # Fallback logic - try alternative source if primary fails
         if not prices_data or len(prices_data) != len(portfolio.tickers):
-            print(f"Primary source failed or returned incomplete data. Attempting fallback...")
+            missing_tickers = [t for t in portfolio.tickers if t not in prices_data]
+            print(f"Primary source failed or returned incomplete data. Missing tickers: {missing_tickers}. Attempting fallback...")
             if provider.source_name == 'alpha_vantage':
-                print("Alpha Vantage failed, falling back to yfinance.")
+                print(f"Alpha Vantage failed for {len(missing_tickers)} ticker(s), falling back to yfinance.")
                 fallback_provider = DataProvider(source='yfinance')
                 prices_data = fallback_provider.get_prices(portfolio.tickers, start_date, end_date)
             elif provider.source_name == 'yfinance':
-                print("yfinance failed, falling back to Alpha Vantage.")
+                print(f"yfinance failed for {len(missing_tickers)} ticker(s), falling back to Alpha Vantage.")
                 api_key = x_alphavantage_key or os.getenv("ALPHAVANTAGE_API_KEY")
                 if api_key:
                     fallback_provider = DataProvider(source='alpha_vantage', api_key=api_key)
                     prices_data = fallback_provider.get_prices(portfolio.tickers, start_date, end_date)
-            
+                else:
+                    print("No Alpha Vantage API key available for fallback.")
+
             if not prices_data or len(prices_data) == 0:
-                return {"error": "Could not download data from any source. Please check ticker symbols and try again."}
+                return {"error": f"Could not download data from any source. Please check ticker symbols ({', '.join(portfolio.tickers)}) and try again."}
 
         # Convert to DataFrame
         df_list = []
@@ -143,13 +146,19 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
         }
 
     # Portfolio metrics
-    portfolio_return = np.sum(returns.mean() * portfolio.weights) * DAYS_IN_YEAR
-    portfolio_volatility = np.sqrt(
-        np.dot(
-            np.array(portfolio.weights).T,
-            np.dot(returns.cov() * DAYS_IN_YEAR, portfolio.weights)
+    if len(portfolio.tickers) == 1:
+        # Single stock: use the stock's metrics directly
+        portfolio_return = individual_metrics[portfolio.tickers[0]]["expected_annual_return"]
+        portfolio_volatility = individual_metrics[portfolio.tickers[0]]["annual_volatility"]
+    else:
+        # Multiple stocks: calculate weighted portfolio metrics
+        portfolio_return = np.sum(returns.mean() * portfolio.weights) * DAYS_IN_YEAR
+        portfolio_volatility = np.sqrt(
+            np.dot(
+                np.array(portfolio.weights).T,
+                np.dot(returns.cov() * DAYS_IN_YEAR, portfolio.weights)
+            )
         )
-    )
     portfolio_sharpe_ratio = (portfolio_return - RISK_FREE_RATE) / portfolio_volatility if portfolio_volatility != 0 else 0
 
     # Generate summary

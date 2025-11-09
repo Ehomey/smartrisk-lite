@@ -49,8 +49,13 @@ def fetch_prices(tickers: List[str], start: str, end: str, api_key: str) -> Dict
                 data = r.json()
 
             if "Time Series (Daily)" not in data:
-                error_msg = data.get('Note') or data.get('Error Message') or 'Unknown error'
+                error_msg = data.get('Note') or data.get('Error Message') or data.get('Information') or f'Unknown error - Response keys: {list(data.keys())}'
                 print(f"Could not fetch data for {ticker} from Alpha Vantage: {error_msg}")
+
+                # Check for common API key issues
+                if "Invalid API call" in str(data) or "premium endpoint" in str(data).lower():
+                    print(f"API Key issue detected. Verify your Alpha Vantage API key is valid and has the required permissions.")
+
                 failed_tickers.append(ticker)
                 continue
 
