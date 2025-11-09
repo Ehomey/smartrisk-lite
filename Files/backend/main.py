@@ -25,10 +25,10 @@ class Portfolio(BaseModel):
 app = FastAPI()
 
 # 3. CORS Configuration
-# Allow localhost for development and Vercel domains for production
+# Allow localhost for development, Vercel domains, and Render domains for production
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"(http://localhost:\d+|https://.*\.vercel\.app)",
+    allow_origin_regex=r"(http://localhost:\d+|https://.*\.vercel\.app|https://.*\.onrender\.com)",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
