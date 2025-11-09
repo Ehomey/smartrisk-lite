@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=SmartRisk Lite
+Comment=Start SmartRisk backend and frontend
+Exec=/usr/bin/env bash -c 'cd "$(dirname "%k")"; chmod +x ./dev.sh; ./dev.sh'
+Terminal=true
+Icon=%k/SmartRisk_Lite_Icon.png
+Categories=Development;

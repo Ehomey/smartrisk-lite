@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(tasklist:*)",
+      "Bash(curl:*)",
+      "Bash(python:*)",
+      "Bash(del \"C:\\Users\\ehome\\Desktop\\Smartrisk\\Files\\backend\\test_yfinance_fix.py\")",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
