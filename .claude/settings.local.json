@@ -9,7 +9,21 @@
       "Bash(python:*)",
       "Bash(del \"C:\\Users\\ehome\\Desktop\\Smartrisk\\Files\\backend\\test_yfinance_fix.py\")",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(del \"C:\\Users\\ehome\\Desktop\\Smartrisk\\Files\\backend\\railway.json\")",
+      "Bash(del \"C:\\Users\\ehome\\Desktop\\Smartrisk\\Files\\backend\\Procfile\")",
+      "Bash(git pull:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(railway status:*)",
+      "Bash(railway whoami:*)",
+      "Bash(railway logs:*)",
+      "Bash(source ~/.bashrc)",
+      "Bash(source:*)",
+      "Bash(cmd //c \"where railway\")",
+      "Bash(railway.cmd logs:*)",
+      "Bash(railway.cmd status:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []
