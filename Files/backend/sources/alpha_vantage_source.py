@@ -26,8 +26,9 @@ def fetch_prices(tickers: List[str], start: str, end: str, api_key: str) -> Dict
             time.sleep(60)
 
         print(f"Fetching data for {ticker} ({i+1}/{len(tickers)})...")
-        
-        url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={ticker}&apikey={api_key}&outputsize=full'
+
+        # Use TIME_SERIES_DAILY (free tier) instead of TIME_SERIES_DAILY_ADJUSTED (premium)
+        url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={api_key}&outputsize=full'
         
         try:
             r = requests.get(url, timeout=10)
@@ -62,9 +63,10 @@ def fetch_prices(tickers: List[str], start: str, end: str, api_key: str) -> Dict
             ticker_prices = []
             for date, values in data["Time Series (Daily)"].items():
                 if start <= date <= end:
+                    # Use "4. close" for free tier (not "5. adjusted close" which is premium)
                     ticker_prices.append({
                         "date": date,
-                        "close": float(values["5. adjusted close"])
+                        "close": float(values["4. close"])
                     })
             
             if not ticker_prices:
