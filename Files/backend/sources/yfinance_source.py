@@ -16,10 +16,15 @@ def fetch_prices(tickers: list[str], start: str, end: str) -> dict:
     """
     try:
         print(f"Fetching data for {len(tickers)} ticker(s) from Yahoo Finance...")
-        
+
+        # Yahoo Finance uses hyphens instead of periods in ticker symbols
+        # Map original tickers to Yahoo format
+        ticker_map = {ticker: ticker.replace('.', '-') for ticker in tickers}
+        yahoo_tickers = list(ticker_map.values())
+
         # Download data with progress=False to reduce console noise
         # Set auto_adjust=False to get the 'Adj Close' column (yfinance changed default to True)
-        data = yf.download(tickers, start=start, end=end, progress=False, auto_adjust=False)['Adj Close']
+        data = yf.download(yahoo_tickers, start=start, end=end, progress=False, auto_adjust=False)['Adj Close']
         
         if data.empty:
             print("No data returned from Yahoo Finance")
@@ -29,31 +34,33 @@ def fetch_prices(tickers: list[str], start: str, end: str) -> dict:
 
         # yfinance now always returns a DataFrame (even for single tickers)
         if isinstance(data, pd.DataFrame):
-            for ticker in tickers:
-                if ticker in data.columns:
-                    ticker_data = data[ticker].dropna()
+            for original_ticker in tickers:
+                yahoo_ticker = ticker_map[original_ticker]
+                if yahoo_ticker in data.columns:
+                    ticker_data = data[yahoo_ticker].dropna()
                     if len(ticker_data) > 0:
-                        prices[ticker] = [
+                        # Use original ticker in the response
+                        prices[original_ticker] = [
                             {"date": index.strftime('%Y-%m-%d'), "close": float(value)}
                             for index, value in ticker_data.items()
                         ]
-                        print(f"Fetched {len(ticker_data)} data points for {ticker}")
+                        print(f"Fetched {len(ticker_data)} data points for {original_ticker}")
                     else:
-                        print(f"No valid data for {ticker}")
+                        print(f"No valid data for {original_ticker}")
                 else:
-                    print(f"Ticker {ticker} not found in response")
+                    print(f"Ticker {original_ticker} not found in response")
         else:
             # Fallback for Series (legacy behavior, unlikely with new yfinance)
-            ticker = tickers[0]
+            original_ticker = tickers[0]
             ticker_data = data.dropna()
             if len(ticker_data) > 0:
-                prices[ticker] = [
+                prices[original_ticker] = [
                     {"date": index.strftime('%Y-%m-%d'), "close": float(value)}
                     for index, value in ticker_data.items()
                 ]
-                print(f"Fetched {len(ticker_data)} data points for {ticker}")
+                print(f"Fetched {len(ticker_data)} data points for {original_ticker}")
             else:
-                print(f"No valid data for {ticker}")
+                print(f"No valid data for {original_ticker}")
 
         print(f"Successfully fetched data for {len(prices)}/{len(tickers)} ticker(s)")
         return prices
