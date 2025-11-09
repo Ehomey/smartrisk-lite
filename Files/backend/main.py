@@ -135,9 +135,14 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
     # Individual metrics
     individual_metrics = {}
     for ticker in portfolio.tickers:
-        ticker_returns = returns[ticker] if len(portfolio.tickers) > 1 else returns
-        expected_return = ticker_returns.mean() * DAYS_IN_YEAR
-        volatility = ticker_returns.std() * np.sqrt(DAYS_IN_YEAR)
+        if len(portfolio.tickers) > 1:
+            ticker_returns = returns[ticker]
+        else:
+            # Single stock: returns is already a Series for that one stock
+            ticker_returns = returns[portfolio.tickers[0]]
+
+        expected_return = float(ticker_returns.mean() * DAYS_IN_YEAR)
+        volatility = float(ticker_returns.std() * np.sqrt(DAYS_IN_YEAR))
         sharpe_ratio = (expected_return - RISK_FREE_RATE) / volatility if volatility != 0 else 0
         individual_metrics[ticker] = {
             "expected_annual_return": expected_return,
