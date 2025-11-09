@@ -27,10 +27,11 @@ function App() {
             }
 
             setLoadingMessage('Analyzing portfolio...');
-            const response = await axios.post('/api/analyze_portfolio', {
+            const apiUrl = import.meta.env.VITE_API_URL || '/api';
+            const response = await axios.post(`${apiUrl}/analyze_portfolio`, {
                 tickers,
                 weights,
-            }, { 
+            }, {
                 headers,
                 timeout: 60000 // 60 second timeout
             });

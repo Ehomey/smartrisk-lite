@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd Files/frontend && npm install && npm run build",
+  "outputDirectory": "Files/frontend/dist",
+  "installCommand": "cd Files/frontend && npm install",
+  "framework": null,
+  "rewrites": []
+}
