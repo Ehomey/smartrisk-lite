@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from typing import List
 import uvicorn
 import os
+from core.monte_carlo import run_monte_carlo_simulation, calculate_portfolio_historical_cagr
 
 # Constants
 RISK_FREE_RATE = 0.04  # 4% annual risk-free rate
@@ -174,11 +175,22 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
     }
     summary = generate_summary(portfolio_metrics_dict, portfolio)
 
-    # Calculate investment horizons (cumulative returns using CAGR)
-    horizons = {
-        "1y": portfolio_return,  # 1 year is just the annual return
-        "3y": (1 + portfolio_return) ** 3 - 1,  # 3-year cumulative
-        "5y": (1 + portfolio_return) ** 5 - 1,  # 5-year cumulative
+    # Calculate historical CAGR from actual realized price data
+    historical_cagr = calculate_portfolio_historical_cagr(data, portfolio.weights)
+
+    # Run Monte Carlo simulation for probabilistic projections
+    mc_results = run_monte_carlo_simulation(
+        daily_returns=returns,
+        weights=portfolio.weights,
+        num_years=10,
+        initial_value=10000
+    )
+
+    # Build projections object with CAGR and Monte Carlo results
+    projections = {
+        "cagr": historical_cagr,
+        "years": mc_results['years'],
+        "percentiles": mc_results['percentiles']
     }
 
     return {
@@ -186,9 +198,9 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
         "portfolio_metrics": {
             "expected_annual_return": portfolio_return,
             "annual_volatility": portfolio_volatility,
-            "sharpe_ratio": portfolio_sharpe_ratio,
-            "horizons": horizons
+            "sharpe_ratio": portfolio_sharpe_ratio
         },
+        "projections": projections,
         "weights": portfolio.weights,  # Add weights for frontend chart
         "tickers": portfolio.tickers,   # Add tickers for reference
         "summary": summary

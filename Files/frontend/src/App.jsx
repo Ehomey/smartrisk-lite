@@ -4,6 +4,8 @@ import InputForm from './components/InputForm';
 import ChartArea from './components/ChartArea';
 import MetricsTable from './components/MetricsTable';
 import SummaryBox from './components/SummaryBox';
+import ProjectionSlider from './components/ProjectionSlider';
+import AdvancedProjections from './components/AdvancedProjections';
 
 function App() {
     const [portfolioData, setPortfolioData] = useState(null);
@@ -104,9 +106,9 @@ function App() {
                             <>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                     <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-                                        <ChartArea 
-                                            tickers={portfolioData.tickers} 
-                                            weights={portfolioData.weights} 
+                                        <ChartArea
+                                            tickers={portfolioData.tickers}
+                                            weights={portfolioData.weights}
                                         />
                                     </div>
                                     <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
@@ -115,6 +117,12 @@ function App() {
                                 </div>
                                 <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
                                     <MetricsTable data={portfolioData} />
+                                </div>
+
+                                {/* New Projection Components */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <ProjectionSlider projections={portfolioData.projections} />
+                                    <AdvancedProjections projections={portfolioData.projections} />
                                 </div>
                             </>
                         )}
