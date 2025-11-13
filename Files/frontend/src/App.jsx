@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import StockSelector from './components/StockSelector';
 import PortfolioBuilder from './components/PortfolioBuilder';
@@ -10,6 +10,29 @@ import AdvancedProjections from './components/AdvancedProjections';
 import DataSourceInfo from './components/DataSourceInfo';
 import ThemeToggle from './components/ThemeToggle';
 
+const REMOTE_API_FALLBACK = 'https://smartrisk-lite-production.up.railway.app';
+const SIMULATION_OPTIONS = [
+    { label: '5k', value: 5000 },
+    { label: '10k', value: 10000 },
+    { label: '20k', value: 20000 },
+];
+
+const resolveApiBase = () => {
+    const envUrl = import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim();
+    if (envUrl) {
+        return envUrl;
+    }
+
+    if (typeof window !== 'undefined') {
+        const host = window.location.hostname;
+        if (host === 'localhost' || host === '127.0.0.1') {
+            return '/api';
+        }
+    }
+
+    return REMOTE_API_FALLBACK;
+};
+
 function App() {
     const [portfolio, setPortfolio] = useState({ tickers: [], weights: [] });
     const [portfolioData, setPortfolioData] = useState(null);
@@ -18,6 +41,7 @@ function App() {
     const [loadingMessage, setLoadingMessage] = useState('');
     const [dataSource, setDataSource] = useState('yfinance');
     const [apiKey, setApiKey] = useState('');
+    const [simulationPaths, setSimulationPaths] = useState(SIMULATION_OPTIONS[0].value);
     const [theme, setTheme] = useState(() => {
         if (typeof window !== 'undefined') {
             const storedTheme = window.localStorage.getItem('sr-theme');
@@ -41,6 +65,8 @@ function App() {
         }
     }, [theme]);
 
+    const apiBaseUrl = useMemo(() => resolveApiBase(), []);
+
     const analyzePortfolio = async (tickers, weights, dataSource, apiKey) => {
         setLoading(true);
         setError(null);
@@ -57,10 +83,10 @@ function App() {
             }
 
             setLoadingMessage('Analyzing portfolio...');
-            const apiUrl = import.meta.env.VITE_API_URL || '/api';
-            const response = await axios.post(`${apiUrl}/analyze_portfolio`, {
+            const response = await axios.post(`${apiBaseUrl}/analyze_portfolio`, {
                 tickers,
                 weights,
+                num_paths: simulationPaths,
             }, {
                 headers,
                 timeout: 60000 // 60 second timeout
@@ -80,7 +106,7 @@ function App() {
             } else if (err.response) {
                 setError(`Server error: ${err.response.data?.error || err.response.statusText}`);
             } else if (err.request) {
-                setError('Cannot connect to the backend server. Please make sure the backend is running on http://localhost:8000');
+                setError(`Cannot connect to the backend server at ${apiBaseUrl}. Please ensure the service is reachable.`);
             } else {
                 setError(`Error: ${err.message}`);
             }
@@ -230,6 +256,43 @@ function App() {
                             </div>
                         </div>
                     )}
+                </div>
+
+                {/* Simulation Settings */}
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-slate-800 max-w-2xl mx-auto mb-6 transition-colors">
+                    <h3 className="text-md font-medium text-gray-900 dark:text-slate-100 mb-2">Monte Carlo Simulations</h3>
+                    <p className="text-sm text-gray-600 dark:text-slate-300 mb-4">
+                        More paths produce smoother percentile bands but require extra processing time.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        {SIMULATION_OPTIONS.map((option) => (
+                            <label
+                                key={option.value}
+                                className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                                    simulationPaths === option.value
+                                        ? 'border-blue-500 bg-blue-50 dark:bg-slate-800/70'
+                                        : 'border-gray-200 dark:border-slate-700'
+                                }`}
+                            >
+                                <input
+                                    type="radio"
+                                    name="simulationPaths"
+                                    value={option.value}
+                                    checked={simulationPaths === option.value}
+                                    onChange={() => setSimulationPaths(option.value)}
+                                    className="mt-1 accent-blue-600"
+                                />
+                                <div>
+                                    <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
+                                        {option.label} simulations
+                                    </p>
+                                    <p className="text-xs text-gray-600 dark:text-slate-400">
+                                        {option.value.toLocaleString()} Monte Carlo paths
+                                    </p>
+                                </div>
+                            </label>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Analyze Button */}

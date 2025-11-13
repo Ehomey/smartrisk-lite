@@ -40,6 +40,7 @@ def run_monte_carlo_simulation(
     # Get number of paths from environment variable or use default
     if num_paths is None:
         num_paths = int(os.getenv('MC_PATH_COUNT', 5000))
+    num_paths = max(1, num_paths)
 
     # Constants
     DAYS_IN_YEAR = 252
@@ -51,46 +52,54 @@ def run_monte_carlo_simulation(
 
     # Convert weights to numpy array if needed
     weights_array = np.array(weights)
+    asset_count = len(weights_array)
 
-    # Generate correlated random returns
-    # Use multivariate normal distribution to respect covariance structure
-    np.random.seed(42)  # For reproducibility in testing; remove in production if desired
+    rng = np.random.default_rng()
 
-    # For single asset, use simpler univariate approach
-    if len(weights) == 1:
-        mean_return = mean_returns[0]
-        std_return = np.sqrt(cov_matrix[0, 0])
-
-        # Generate random returns: shape (num_paths, total_days)
-        simulated_returns = np.random.normal(
-            loc=mean_return,
-            scale=std_return,
-            size=(num_paths, total_days)
-        )
+    # Precompute structures for correlated sampling to avoid repeated decompositions
+    chol = None
+    if asset_count > 1:
+        try:
+            chol = np.linalg.cholesky(cov_matrix)
+        except np.linalg.LinAlgError:
+            # Add small jitter for numerical stability
+            jitter = np.eye(asset_count) * 1e-8
+            chol = np.linalg.cholesky(cov_matrix + jitter)
     else:
-        # Multi-asset: generate correlated returns for each asset
-        # Shape: (total_days, num_paths, num_assets)
-        simulated_asset_returns = np.random.multivariate_normal(
-            mean=mean_returns,
-            cov=cov_matrix,
-            size=(total_days, num_paths)
-        )
+        # Single asset stats
+        mean_return_single = mean_returns[0]
+        std_return_single = np.sqrt(max(cov_matrix[0, 0], 0))
 
-        # Calculate portfolio returns by weighting: (total_days, num_paths)
-        simulated_returns = np.dot(simulated_asset_returns, weights_array).T
-
-    # Convert returns to portfolio values
-    # Start with initial_value and compound daily returns
-    # Shape: (num_paths, total_days + 1) - includes initial value at t=0
-    portfolio_values = np.zeros((num_paths, total_days + 1))
-    portfolio_values[:, 0] = initial_value
-
-    # Compound returns: V(t) = V(t-1) * (1 + r(t))
-    for day in range(total_days):
-        portfolio_values[:, day + 1] = portfolio_values[:, day] * (1 + simulated_returns[:, day])
-
-    # Extract values at each year-end
     years = list(range(1, num_years + 1))
+    capture_lookup = {year * DAYS_IN_YEAR: year for year in years}
+    yearly_values = {year: [] for year in years}
+
+    chunk_size = int(os.getenv('MC_PATH_CHUNK_SIZE', 500))
+    chunk_size = max(1, min(chunk_size, num_paths))
+
+    for chunk_start in range(0, num_paths, chunk_size):
+        paths_in_chunk = min(chunk_size, num_paths - chunk_start)
+        current_values = np.full(paths_in_chunk, initial_value, dtype=np.float64)
+
+        for day in range(1, total_days + 1):
+            if asset_count == 1:
+                daily_returns = rng.normal(
+                    loc=mean_return_single,
+                    scale=std_return_single,
+                    size=paths_in_chunk
+                )
+            else:
+                standard_normals = rng.standard_normal(size=(paths_in_chunk, asset_count))
+                correlated = standard_normals @ chol.T
+                correlated += mean_returns
+                daily_returns = correlated @ weights_array
+
+            current_values *= (1 + daily_returns)
+
+            if day in capture_lookup:
+                year = capture_lookup[day]
+                yearly_values[year].append(current_values.copy())
+
     percentiles = {
         'p10': [],
         'p50': [],
@@ -99,14 +108,15 @@ def run_monte_carlo_simulation(
     }
 
     for year in years:
-        day_index = year * DAYS_IN_YEAR  # End of year (252, 504, 756, ...)
-        year_end_values = portfolio_values[:, day_index]
+        if yearly_values[year]:
+            year_samples = np.concatenate(yearly_values[year])
+        else:
+            year_samples = np.array([initial_value], dtype=np.float64)
 
-        # Calculate percentiles and mean
-        percentiles['p10'].append(float(np.percentile(year_end_values, 10)))
-        percentiles['p50'].append(float(np.percentile(year_end_values, 50)))
-        percentiles['p90'].append(float(np.percentile(year_end_values, 90)))
-        percentiles['mean'].append(float(np.mean(year_end_values)))
+        percentiles['p10'].append(float(np.percentile(year_samples, 10)))
+        percentiles['p50'].append(float(np.percentile(year_samples, 50)))
+        percentiles['p90'].append(float(np.percentile(year_samples, 90)))
+        percentiles['mean'].append(float(np.mean(year_samples)))
 
     return {
         'years': years,

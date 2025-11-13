@@ -21,6 +21,7 @@ This doc keeps every agent aligned on the product vision, current focus, and pri
 - **Done**: `DataSourceInfo` component showing cache status and original data provider with color-coded badges.
 - **Done**: Enhanced `SummaryBox` renamed to "Portfolio Analysis" with detailed risk interpretation, diversification metrics, and concentration warnings.
 - **Done**: Global dark-mode toggle with persisted preference + Tailwind dark styles across major UI panels.
+- **Done**: Simulation settings UI exposing 5k/10k/20k Monte Carlo path counts with accessible radio buttons.
 - **Planned**: Add initial investment and periodic contribution inputs for cash-flow-aware projections.
 
 ### Analytics (Backend logic)
@@ -32,6 +33,7 @@ This doc keeps every agent aligned on the product vision, current focus, and pri
 - **Done**: Enhanced `generate_summary()` with 5-level Sharpe interpretation, return classification, volatility assessment, diversification analysis.
 - **Done**: Expanded asset database to 236 entries with `assetClass` field for filtering.
 - **Done**: Frontend warning system for Alpha Vantage limitations (25 calls/day, 5 calls/min, automatic fallback).
+- **Done**: Monte Carlo engine refactored to stream simulations in memory-safe chunks while honoring user-selected path counts up to 20k.
 - **Next Up**:
   1. Extend `Portfolio` model + validation for `initial_investment`, `monthly_contribution`, `contribution_frequency`.
   2. Update Monte Carlo simulations to include contributions and emit dollar projections alongside percentages.

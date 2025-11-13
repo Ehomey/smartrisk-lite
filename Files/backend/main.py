@@ -19,12 +19,14 @@ SHARPE_THRESHOLD_HIGH = 1.0
 DAYS_IN_YEAR = 252
 LOOKBACK_DAYS = 365
 POPULAR_STOCKS_PATH = os.path.join(os.path.dirname(__file__), 'data', 'popular_stocks.json')
+ALLOWED_PATH_COUNTS = [5000, 10000, 20000]
 
 
 # 1. Input Data Model
 class Portfolio(BaseModel):
     tickers: List[str]
     weights: List[float]
+    num_paths: Optional[int] = None
 
 # 2. FastAPI App Initialization
 app = FastAPI()
@@ -239,6 +241,10 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
     except ValueError as e:
         return {"error": str(e)}
 
+    simulation_paths = portfolio.num_paths
+    if simulation_paths is not None and simulation_paths not in ALLOWED_PATH_COUNTS:
+        return {"error": f"num_paths must be one of {ALLOWED_PATH_COUNTS}. Received {simulation_paths}."}
+
     # Fetch data with caching and hybrid source strategy
     end_date = datetime.now().strftime('%Y-%m-%d')
     start_date = (datetime.now() - timedelta(days=LOOKBACK_DAYS)).strftime('%Y-%m-%d')
@@ -378,7 +384,8 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
         daily_returns=returns,
         weights=adjusted_weights,
         num_years=10,
-        initial_value=10000
+        initial_value=10000,
+        num_paths=simulation_paths
     )
 
     # Build projections object with CAGR and Monte Carlo results
