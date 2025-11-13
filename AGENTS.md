@@ -24,6 +24,7 @@ This doc keeps every agent aligned on the product vision, current focus, and pri
 - **Done**: Simulation settings UI so users can pick 5k/10k/20k Monte Carlo runs via accessible radio buttons.
 - **Done**: PortfolioBuilder now edits weights in percentages with a running 100% total indicator for clarity.
 - **Done**: StockSelector includes labeled filters, server-side pagination, a “+ Add” button, and live market lookup for tickers outside the curated list.
+- **Done**: Added expandable “About These Insights” section that explains each metric in beginner-friendly language.
 - **Planned**: Add initial investment and periodic contribution inputs for cash-flow-aware projections.
 
 ### Analytics (Backend logic)

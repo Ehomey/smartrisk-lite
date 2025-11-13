@@ -1,0 +1,1 @@
+## Frontend Tests\n\n- PortfolioBuilder percentages and total allocation\n- PortfolioBuilder onWeightChange behavior\n- StockSelector filtering and '+ Add' button\n- AboutInsights accordion opening/closing\n

@@ -9,6 +9,7 @@ import ProjectionSlider from './components/ProjectionSlider';
 import AdvancedProjections from './components/AdvancedProjections';
 import DataSourceInfo from './components/DataSourceInfo';
 import ThemeToggle from './components/ThemeToggle';
+import AboutInsights from './components/AboutInsights';
 
 const REMOTE_API_FALLBACK = 'https://smartrisk-lite-production.up.railway.app';
 const SIMULATION_OPTIONS = [
@@ -382,6 +383,10 @@ function App() {
                             </div>
                         )}
                     </div>
+
+                <div className="max-w-3xl mx-auto mb-10">
+                    <AboutInsights />
+                </div>
             </main>
 
             <footer className="bg-white dark:bg-slate-950 border-t border-gray-200 dark:border-slate-800 mt-12 transition-colors">

@@ -14,7 +14,8 @@ def run_monte_carlo_simulation(
     weights,
     num_years=10,
     num_paths=None,
-    initial_value=10000
+    initial_value=10000,
+    rng=None,
 ):
     """
     Run Monte Carlo simulation for portfolio projections.
@@ -37,7 +38,6 @@ def run_monte_carlo_simulation(
             }
         }
     """
-    # Get number of paths from environment variable or use default
     if num_paths is None:
         num_paths = int(os.getenv('MC_PATH_COUNT', 5000))
     num_paths = max(1, num_paths)
@@ -54,7 +54,7 @@ def run_monte_carlo_simulation(
     weights_array = np.array(weights)
     asset_count = len(weights_array)
 
-    rng = np.random.default_rng()
+    rng = rng or np.random.default_rng()
 
     # Precompute structures for correlated sampling to avoid repeated decompositions
     chol = None

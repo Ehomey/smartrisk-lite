@@ -24,6 +24,7 @@ This doc keeps every agent aligned on the product vision, current focus, and pri
 - **Done**: Simulation settings UI offering 5k/10k/20k Monte Carlo path counts selectable via radio buttons.
 - **Done**: PortfolioBuilder weight controls now use percentages with a live 100% total indicator.
 - **Done**: StockSelector gets labeled filters, server-side pagination, a tap-friendly “+ Add” action, and a live market lookup for any searched ticker.
+- **Done**: Added an “About These Insights” accordion that teaches each metric/result in clear, beginner-friendly language.
 - **Planned**: Add initial investment and periodic contribution inputs for cash-flow-aware projections.
 
 ### Analytics (Backend logic)
