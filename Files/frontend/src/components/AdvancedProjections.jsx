@@ -156,15 +156,15 @@ function AdvancedProjections({ projections, initialInvestment = 10000 }) {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+    <div className="bg-white dark:bg-slate-900 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-slate-800 transition-colors">
       {/* Collapsible Header */}
       <div
         className="flex justify-between items-center cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <h3 className="text-lg font-medium text-gray-900">Advanced Projections</h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Advanced Projections</h3>
         <button
-          className="text-blue-600 hover:text-blue-800 transition-colors"
+          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
           aria-label={isExpanded ? "Collapse" : "Expand"}
         >
           {isExpanded ? (
@@ -182,7 +182,7 @@ function AdvancedProjections({ projections, initialInvestment = 10000 }) {
       {/* Expandable Content */}
       {isExpanded && (
         <div className="mt-6">
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-gray-600 dark:text-slate-300 mb-4">
             This chart shows the range of possible outcomes for your portfolio based on {projections.percentiles.p10.length} years of Monte Carlo simulation.
             The shaded areas represent the uncertainty range between different percentiles.
           </p>
@@ -193,9 +193,9 @@ function AdvancedProjections({ projections, initialInvestment = 10000 }) {
           </div>
 
           {/* Legend Explanation */}
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <h4 className="text-sm font-semibold text-gray-800 mb-2">Understanding the Chart</h4>
-            <ul className="text-xs text-gray-600 space-y-1">
+          <div className="mt-4 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
+            <h4 className="text-sm font-semibold text-gray-800 dark:text-slate-100 mb-2">Understanding the Chart</h4>
+            <ul className="text-xs text-gray-600 dark:text-slate-300 space-y-1">
               <li><strong>P90 (Green):</strong> Only 10% of simulations performed better than this outcome</li>
               <li><strong>P50 (Blue):</strong> Median outcome - half of simulations were above, half below</li>
               <li><strong>P10 (Red):</strong> Only 10% of simulations performed worse than this outcome</li>
@@ -204,11 +204,11 @@ function AdvancedProjections({ projections, initialInvestment = 10000 }) {
           </div>
 
           {/* Statistical Details */}
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <h4 className="text-sm font-semibold text-blue-900 mb-2">Historical Context</h4>
-            <p className="text-xs text-blue-800">
+          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-500/10 rounded-lg border border-blue-200 dark:border-blue-400/60">
+            <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-2">Historical Context</h4>
+            <p className="text-xs text-blue-800 dark:text-blue-100">
               <strong>Historical CAGR:</strong> {(projections.cagr * 100).toFixed(2)}%
-              <span className="ml-2 text-blue-700">
+              <span className="ml-2 text-blue-700 dark:text-blue-200">
                 (Compound Annual Growth Rate based on your portfolio's actual historical performance)
               </span>
             </p>

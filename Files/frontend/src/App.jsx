@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import StockSelector from './components/StockSelector';
 import PortfolioBuilder from './components/PortfolioBuilder';
@@ -8,6 +8,7 @@ import SummaryBox from './components/SummaryBox';
 import ProjectionSlider from './components/ProjectionSlider';
 import AdvancedProjections from './components/AdvancedProjections';
 import DataSourceInfo from './components/DataSourceInfo';
+import ThemeToggle from './components/ThemeToggle';
 
 function App() {
     const [portfolio, setPortfolio] = useState({ tickers: [], weights: [] });
@@ -17,6 +18,28 @@ function App() {
     const [loadingMessage, setLoadingMessage] = useState('');
     const [dataSource, setDataSource] = useState('yfinance');
     const [apiKey, setApiKey] = useState('');
+    const [theme, setTheme] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const storedTheme = window.localStorage.getItem('sr-theme');
+            if (storedTheme) {
+                return storedTheme;
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return 'light';
+    });
+
+    useEffect(() => {
+        const root = document.documentElement;
+        if (theme === 'dark') {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
+        if (typeof window !== 'undefined') {
+            window.localStorage.setItem('sr-theme', theme);
+        }
+    }, [theme]);
 
     const analyzePortfolio = async (tickers, weights, dataSource, apiKey) => {
         setLoading(true);
@@ -64,6 +87,10 @@ function App() {
         }
         setLoading(false);
         setLoadingMessage('');
+    };
+
+    const toggleTheme = () => {
+        setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
     };
 
     // Portfolio management functions
@@ -119,15 +146,20 @@ function App() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800">
-            <header className="bg-white shadow-md border-b-4 border-blue-500">
-                <div className="container mx-auto px-4 py-6">
-                    <h1 className="text-3xl font-bold text-center text-blue-600">SmartRisk Lite</h1>
-                    <p className="text-center text-gray-600 mt-2">Portfolio Risk Analysis Tool</p>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 dark:from-slate-950 dark:to-slate-900 dark:text-slate-100 transition-colors duration-300">
+            <header className="bg-white/90 dark:bg-slate-950/80 backdrop-blur shadow-md border-b-4 border-blue-500 dark:border-blue-600 transition-colors">
+                <div className="container mx-auto px-4 py-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="text-center md:text-left">
+                        <h1 className="text-3xl font-bold text-blue-600 dark:text-blue-400">SmartRisk Lite</h1>
+                        <p className="text-center md:text-left text-gray-600 dark:text-slate-300 mt-2">Portfolio Risk Analysis Tool</p>
+                    </div>
+                    <div className="flex justify-center md:justify-end">
+                        <ThemeToggle theme={theme} onToggle={toggleTheme} />
+                    </div>
                 </div>
             </header>
 
-            <main className="container mx-auto p-4 py-8">
+            <main className="container mx-auto p-4 py-8 transition-colors duration-300">
                 {/* Portfolio Builder Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     <StockSelector />
@@ -140,18 +172,18 @@ function App() {
                 </div>
 
                 {/* Data Source Settings */}
-                <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 max-w-2xl mx-auto mb-6">
-                    <h3 className="text-md font-medium text-gray-900 mb-4">Data Source Settings</h3>
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-slate-800 max-w-2xl mx-auto mb-6 transition-colors">
+                    <h3 className="text-md font-medium text-gray-900 dark:text-slate-100 mb-4">Data Source Settings</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="dataSource" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="dataSource" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">
                                 Data Provider
                             </label>
                             <select
                                 id="dataSource"
                                 value={dataSource}
                                 onChange={(e) => setDataSource(e.target.value)}
-                                className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border"
+                                className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border transition-colors"
                             >
                                 <option value="yfinance">Yahoo Finance (Free, No API Key)</option>
                                 <option value="alpha_vantage">Alpha Vantage (Requires API Key)</option>
@@ -160,7 +192,7 @@ function App() {
 
                         {dataSource === 'alpha_vantage' && (
                             <div>
-                                <label htmlFor="apiKey" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="apiKey" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">
                                     Alpha Vantage API Key
                                 </label>
                                 <input
@@ -169,7 +201,7 @@ function App() {
                                     value={apiKey}
                                     onChange={(e) => setApiKey(e.target.value)}
                                     placeholder="Enter your API key"
-                                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                    className="block w-full px-3 py-2 border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
                                 />
                             </div>
                         )}
@@ -177,16 +209,16 @@ function App() {
 
                     {/* Alpha Vantage Warning */}
                     {dataSource === 'alpha_vantage' && (
-                        <div className="mt-4 bg-amber-50 border-l-4 border-amber-400 p-4 rounded">
+                        <div className="mt-4 bg-amber-50 border-l-4 border-amber-400 dark:bg-amber-500/10 dark:border-amber-400/70 p-4 rounded">
                             <div className="flex">
                                 <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className="h-5 w-5 text-amber-400 dark:text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                     </svg>
                                 </div>
                                 <div className="ml-3">
-                                    <h3 className="text-sm font-medium text-amber-800">Alpha Vantage Limitations</h3>
-                                    <div className="mt-2 text-sm text-amber-700">
+                                    <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">Alpha Vantage Limitations</h3>
+                                    <div className="mt-2 text-sm text-amber-700 dark:text-amber-100">
                                         <ul className="list-disc list-inside space-y-1">
                                             <li><strong>25 API calls per day</strong> limit (free tier)</li>
                                             <li><strong>5 calls per minute</strong> rate limit</li>
@@ -205,7 +237,7 @@ function App() {
                     <button
                         onClick={handleAnalyze}
                         disabled={loading || portfolio.tickers.length === 0}
-                        className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                        className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 dark:disabled:bg-slate-700 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-slate-900"
                     >
                         {loading ? 'Analyzing...' : 'Analyze Portfolio'}
                     </button>
@@ -214,24 +246,24 @@ function App() {
                 {/* Results Section */}
                 <div className="space-y-8">
                         {loading && (
-                            <div className="flex flex-col justify-center items-center h-64 bg-white rounded-lg shadow-lg p-8">
+                            <div className="flex flex-col justify-center items-center h-64 bg-white dark:bg-slate-900 rounded-lg shadow-lg p-8 transition-colors">
                                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
-                                <p className="text-gray-600 font-medium">{loadingMessage}</p>
-                                <p className="text-gray-400 text-sm mt-2">This may take a few moments...</p>
+                                <p className="text-gray-600 dark:text-slate-200 font-medium">{loadingMessage}</p>
+                                <p className="text-gray-400 dark:text-slate-400 text-sm mt-2">This may take a few moments...</p>
                             </div>
                         )}
 
                         {error && (
-                            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-6 py-4 rounded-lg shadow-md" role="alert">
+                            <div className="bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 text-red-700 dark:text-red-300 px-6 py-4 rounded-lg shadow-md" role="alert">
                                 <div className="flex items-start">
                                     <div className="flex-shrink-0">
-                                        <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg className="h-6 w-6 text-red-500 dark:text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
                                     <div className="ml-3">
-                                        <h3 className="text-sm font-bold">Error</h3>
-                                        <p className="text-sm mt-1">{error}</p>
+                                        <h3 className="text-sm font-bold text-red-800 dark:text-red-200">Error</h3>
+                                        <p className="text-sm mt-1 text-red-700 dark:text-red-200/80">{error}</p>
                                     </div>
                                 </div>
                             </div>
@@ -241,16 +273,16 @@ function App() {
                             <>
                                 {/* Warning Message for Partial Failures */}
                                 {portfolioData.warning && (
-                                    <div className="bg-amber-50 border-l-4 border-amber-400 text-amber-800 px-6 py-4 rounded-lg shadow-md mb-6" role="alert">
+                                    <div className="bg-amber-50 dark:bg-amber-500/10 border-l-4 border-amber-400 dark:border-amber-300 text-amber-800 dark:text-amber-100 px-6 py-4 rounded-lg shadow-md mb-6" role="alert">
                                         <div className="flex items-start">
                                             <div className="flex-shrink-0">
-                                                <svg className="h-6 w-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <svg className="h-6 w-6 text-amber-400 dark:text-amber-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                                 </svg>
                                             </div>
                                             <div className="ml-3">
-                                                <h3 className="text-sm font-bold">Warning</h3>
-                                                <p className="text-sm mt-1">{portfolioData.warning}</p>
+                                                <h3 className="text-sm font-bold text-amber-900 dark:text-amber-100">Warning</h3>
+                                                <p className="text-sm mt-1 text-amber-800 dark:text-amber-100/80">{portfolioData.warning}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -262,10 +294,10 @@ function App() {
                                 )}
 
                                 {/* Portfolio Summary */}
-                                <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                                <div className="bg-white dark:bg-slate-900 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-slate-800 transition-colors">
                                     <SummaryBox summary={portfolioData.summary} />
                                 </div>
-                                <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                                <div className="bg-white dark:bg-slate-900 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-slate-800 transition-colors">
                                     <MetricsTable data={portfolioData} />
                                 </div>
 
@@ -278,21 +310,21 @@ function App() {
                         )}
 
                         {!portfolioData && !loading && !error && (
-                            <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 text-center">
-                                <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <div className="bg-white dark:bg-slate-900 p-8 rounded-lg shadow-lg border border-gray-200 dark:border-slate-800 text-center transition-colors">
+                                <svg className="mx-auto h-16 w-16 text-gray-400 dark:text-slate-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                 </svg>
-                                <h3 className="text-lg font-medium text-gray-800 mb-2">No Analysis Yet</h3>
-                                <p className="text-gray-600">Drag stocks into your portfolio and click "Analyze Portfolio" to get started.</p>
+                                <h3 className="text-lg font-medium text-gray-800 dark:text-slate-100 mb-2">No Analysis Yet</h3>
+                                <p className="text-gray-600 dark:text-slate-300">Drag stocks into your portfolio and click "Analyze Portfolio" to get started.</p>
                             </div>
                         )}
                     </div>
             </main>
 
-            <footer className="bg-white border-t border-gray-200 mt-12">
-                <div className="container mx-auto px-4 py-6 text-center text-gray-600 text-sm">
+            <footer className="bg-white dark:bg-slate-950 border-t border-gray-200 dark:border-slate-800 mt-12 transition-colors">
+                <div className="container mx-auto px-4 py-6 text-center text-gray-600 dark:text-slate-300 text-sm">
                     <p>SmartRisk Lite - Portfolio Risk Analysis © {new Date().getFullYear()}</p>
-                    <p className="mt-2 text-xs text-gray-500">
+                    <p className="mt-2 text-xs text-gray-500 dark:text-slate-400">
                         Disclaimer: This tool is for educational purposes only. Not financial advice.
                     </p>
                 </div>

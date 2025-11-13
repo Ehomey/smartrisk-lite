@@ -59,7 +59,7 @@ const ChartArea = ({ tickers, weights }) => {
 
     return (
         <div>
-            <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">Portfolio Allocation</h3>
+            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-slate-100 mb-4">Portfolio Allocation</h3>
             <div className="mt-4">
                 <Pie data={chartData} options={options} />
             </div>

@@ -20,6 +20,7 @@ This doc keeps every agent aligned on the product vision, current focus, and pri
 - **Done**: `AdvancedProjections` collapsible Monte Carlo percentile chart (P10/P50/P90 visualization).
 - **Done**: `DataSourceInfo` component showing cache status and original data provider with color-coded badges.
 - **Done**: Enhanced `SummaryBox` renamed to "Portfolio Analysis" with detailed risk interpretation, diversification metrics, and concentration warnings.
+- **Done**: Global dark-mode toggle with persisted preference + Tailwind dark styles across major UI panels.
 - **Planned**: Add initial investment and periodic contribution inputs for cash-flow-aware projections.
 
 ### Analytics (Backend logic)
@@ -85,6 +86,9 @@ Items 1–2 unblock contribution-based projections; downstream tasks (3–6) enh
 - Dual filtering: Asset Class + Sector dropdowns
 - Results counter: "Showing X of 236 assets"
 - Color-coded badges (Blue=Stock, Green=ETF, Purple=Crypto)
+
+### Theming & Polish
+- Added dark-mode toggle with persisted preference plus refreshed Tailwind `dark:` styles across selectors, builders, projections, tables, and summary cards.
 
 ---
 
