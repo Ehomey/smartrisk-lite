@@ -23,7 +23,20 @@
       "Bash(cmd //c \"where railway\")",
       "Bash(railway.cmd logs:*)",
       "Bash(railway.cmd status:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(railway domain:*)",
+      "Bash(railway.cmd:*)",
+      "Bash(cmd //c \"where vercel\")",
+      "Bash(vercel.cmd:*)",
+      "Bash(timeout /t 3 /nobreak)",
+      "Bash(nul)",
+      "Bash(npm run lint)",
+      "Bash(npx eslint:*)",
+      "WebSearch",
+      "WebFetch(domain:pypi.org)",
+      "Bash(git remote get-url:*)",
+      "Bash(test:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

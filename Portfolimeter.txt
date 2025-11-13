@@ -1,0 +1,3 @@
+Portfolimeter /ˌpôrtfōlˈɪmətər/ n.
+A conceptual or hypothetical tool, device, or software designed to measure and quantify the risk profile of a financial portfolio, typically composed of stocks, bonds, and other investments.
+Usage: The portfolimeter analyzes metrics such as volatility (standard deviation), market sensitivity (beta), and diversification levels to generate a comprehensive risk assessment.

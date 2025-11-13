@@ -5,10 +5,12 @@ from datetime import datetime, timedelta
 from fastapi import FastAPI, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import uvicorn
 import os
+import json
 from core.monte_carlo import run_monte_carlo_simulation, calculate_portfolio_historical_cagr
+from core.cache_manager import get_cache
 
 # Constants
 RISK_FREE_RATE = 0.04  # 4% annual risk-free rate
@@ -16,6 +18,8 @@ SHARPE_THRESHOLD_LOW = 0.5
 SHARPE_THRESHOLD_HIGH = 1.0
 DAYS_IN_YEAR = 252
 LOOKBACK_DAYS = 365
+POPULAR_STOCKS_PATH = os.path.join(os.path.dirname(__file__), 'data', 'popular_stocks.json')
+
 
 # 1. Input Data Model
 class Portfolio(BaseModel):
@@ -36,6 +40,140 @@ app.add_middleware(
 )
 
 # Helper Functions
+def fetch_prices_with_cache_and_hybrid(tickers, start_date, end_date, primary_source='yfinance', api_key=None):
+    """
+    Intelligent data fetching with caching and hybrid source strategy.
+
+    Strategy:
+    1. Check cache for all tickers first
+    2. For uncached tickers:
+       - If Alpha Vantage: fetch first 5, use yfinance for rest (rate limit workaround)
+       - If yfinance: fetch all remaining
+    3. Cache all newly fetched data
+    4. Return combined results
+
+    Args:
+        tickers: List of ticker symbols
+        start_date: Start date (YYYY-MM-DD)
+        end_date: End date (YYYY-MM-DD)
+        primary_source: 'yfinance' or 'alpha_vantage'
+        api_key: Alpha Vantage API key (if needed)
+
+    Returns:
+        dict: {ticker: [{"date": "YYYY-MM-DD", "close": price}, ...]}
+    """
+    from core.data_adapter import DataProvider
+
+    cache = get_cache()
+    prices_data = {}
+    source_info = {}  # Track data source for each ticker
+    uncached_tickers = []
+
+    # Step 1: Check cache
+    print(f"Checking cache for {len(tickers)} ticker(s)...")
+    for ticker in tickers:
+        cached_data, original_source = cache.get(ticker, start_date, end_date)
+        if cached_data:
+            prices_data[ticker] = cached_data
+            # Format source as "OriginalSource (Cached)"
+            display_source = f"{original_source} (cached)" if original_source != 'unknown' else "cache"
+            source_info[ticker] = {"source": display_source, "cached": True}
+            print(f"  ✓ {ticker}: Found in cache (original source: {original_source})")
+        else:
+            uncached_tickers.append(ticker)
+            print(f"  ✗ {ticker}: Not in cache")
+
+    # Step 2: Fetch uncached data
+    if uncached_tickers:
+        print(f"Fetching {len(uncached_tickers)} uncached ticker(s)...")
+
+        if primary_source == 'alpha_vantage' and len(uncached_tickers) > 5:
+            # Hybrid approach for Alpha Vantage rate limits
+            print(f"⚠ Alpha Vantage rate limit: Fetching first 5 with AV, rest with yfinance")
+
+            # Fetch first 5 with Alpha Vantage
+            av_tickers = uncached_tickers[:5]
+            yf_tickers = uncached_tickers[5:]
+
+            try:
+                av_provider = DataProvider(source='alpha_vantage', api_key=api_key)
+                av_data = av_provider.get_prices(av_tickers, start_date, end_date)
+                prices_data.update(av_data)
+
+                # Cache Alpha Vantage data
+                for ticker, data in av_data.items():
+                    cache.set(ticker, start_date, end_date, data, source='alpha_vantage')
+                    source_info[ticker] = {"source": "alpha_vantage", "cached": False}
+                    print(f"  ✓ {ticker}: Fetched from Alpha Vantage & cached")
+            except Exception as e:
+                print(f"  ✗ Alpha Vantage fetch failed: {e}")
+                # Add AV tickers back to yfinance fallback list
+                yf_tickers = uncached_tickers
+
+            # Fetch remaining with yfinance
+            if yf_tickers:
+                try:
+                    yf_provider = DataProvider(source='yfinance')
+                    yf_data = yf_provider.get_prices(yf_tickers, start_date, end_date)
+                    prices_data.update(yf_data)
+
+                    # Cache yfinance data
+                    for ticker, data in yf_data.items():
+                        cache.set(ticker, start_date, end_date, data, source='yfinance')
+                        source_info[ticker] = {"source": "yfinance", "cached": False}
+                        print(f"  ✓ {ticker}: Fetched from yfinance & cached")
+                except Exception as e:
+                    print(f"  ✗ yfinance fallback failed: {e}")
+
+        else:
+            # Use primary source for all (no rate limit issues)
+            try:
+                provider = DataProvider(source=primary_source, api_key=api_key)
+                new_data = provider.get_prices(uncached_tickers, start_date, end_date)
+                prices_data.update(new_data)
+
+                # Cache fetched data
+                for ticker, data in new_data.items():
+                    cache.set(ticker, start_date, end_date, data, source=primary_source)
+                    source_info[ticker] = {"source": primary_source, "cached": False}
+                    print(f"  ✓ {ticker}: Fetched from {primary_source} & cached")
+            except Exception as e:
+                print(f"  ✗ {primary_source} fetch failed: {e}")
+
+                # Fallback to yfinance if primary failed
+                if primary_source != 'yfinance':
+                    try:
+                        yf_provider = DataProvider(source='yfinance')
+                        yf_data = yf_provider.get_prices(uncached_tickers, start_date, end_date)
+                        prices_data.update(yf_data)
+
+                        for ticker, data in yf_data.items():
+                            cache.set(ticker, start_date, end_date, data, source='yfinance')
+                            source_info[ticker] = {"source": "yfinance (fallback)", "cached": False}
+                            print(f"  ✓ {ticker}: Fetched from yfinance (fallback) & cached")
+                    except Exception as e2:
+                        print(f"  ✗ yfinance fallback also failed: {e2}")
+
+    # Final check: if any tickers are still missing, try fetching them with yfinance
+    missing_tickers = [t for t in tickers if t not in prices_data]
+    if missing_tickers and primary_source != 'yfinance':
+        print(f"\n⚠ {len(missing_tickers)} ticker(s) still missing after primary fetch. Attempting yfinance fallback...")
+        try:
+            yf_provider = DataProvider(source='yfinance')
+            yf_data = yf_provider.get_prices(missing_tickers, start_date, end_date)
+
+            for ticker, data in yf_data.items():
+                prices_data[ticker] = data
+                cache.set(ticker, start_date, end_date, data, source='yfinance')
+                source_info[ticker] = {"source": "yfinance (rate limit fallback)", "cached": False}
+                print(f"  ✓ {ticker}: Fetched from yfinance (rate limit fallback) & cached")
+        except Exception as e:
+            print(f"  ✗ yfinance fallback failed: {e}")
+
+    print(f"Final result: {len(prices_data)}/{len(tickers)} tickers successfully fetched")
+    return prices_data, source_info
+
+
 def validate_portfolio_inputs(tickers: List[str], weights: List[float]):
     """
     Validates portfolio input data.
@@ -63,7 +201,30 @@ def validate_portfolio_inputs(tickers: List[str], weights: List[float]):
         raise ValueError(f"The sum of weights must be 1.0 (currently {sum(weights):.4f}).")
 
 
-# 4. Analysis Endpoint
+# 4. API Endpoints
+@app.get("/popular_stocks")
+async def get_popular_stocks(asset_type: Optional[str] = None):
+    """
+    Serves a list of popular stocks, ETFs, and crypto assets.
+    Optionally filters by asset_type ('Stock', 'ETF', 'Crypto').
+    """
+    try:
+        with open(POPULAR_STOCKS_PATH, 'r') as f:
+            stocks = json.load(f)
+        
+        if asset_type:
+            # Case-insensitive filtering
+            return [
+                stock for stock in stocks 
+                if stock.get('sector', '').lower() == asset_type.lower()
+            ]
+        return stocks
+    except FileNotFoundError:
+        return {"error": "Popular stocks file not found."}
+    except Exception as e:
+        return {"error": f"An error occurred: {e}"}
+
+
 @app.post("/analyze_portfolio")
 async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(None, alias="X-Data-Source"), x_alphavantage_key: str = Header(None, alias="X-AlphaVantage-Key")):
     """
@@ -78,40 +239,66 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
     except ValueError as e:
         return {"error": str(e)}
 
-    # Fetch data
-    from core.data_adapter import get_provider_from_env, DataProvider
-
+    # Fetch data with caching and hybrid source strategy
     end_date = datetime.now().strftime('%Y-%m-%d')
     start_date = (datetime.now() - timedelta(days=LOOKBACK_DAYS)).strftime('%Y-%m-%d')
 
     try:
+        # Determine primary data source
         if x_data_source:
-            provider = DataProvider(source=x_data_source, api_key=x_alphavantage_key)
+            primary_source = x_data_source
+            api_key = x_alphavantage_key
         else:
+            from core.data_adapter import get_provider_from_env
             provider = get_provider_from_env()
+            primary_source = provider.source_name
+            api_key = os.getenv("ALPHAVANTAGE_API_KEY") if primary_source == 'alpha_vantage' else None
 
-        print(f"Using data source: {provider.source_name}")
-        prices_data = provider.get_prices(portfolio.tickers, start_date, end_date)
+        print(f"Using primary data source: {primary_source}")
 
-        # Fallback logic - try alternative source if primary fails
-        if not prices_data or len(prices_data) != len(portfolio.tickers):
+        # Use intelligent caching and hybrid fetching
+        prices_data, source_info = fetch_prices_with_cache_and_hybrid(
+            tickers=portfolio.tickers,
+            start_date=start_date,
+            end_date=end_date,
+            primary_source=primary_source,
+            api_key=api_key
+        )
+
+        # Check if we got data for all tickers
+        if not prices_data or len(prices_data) == 0:
+            error_msg = f"Could not download data from any source. Please check ticker symbols ({', '.join(portfolio.tickers)}) and try again."
+            if primary_source == 'alpha_vantage':
+                error_msg += " Note: Alpha Vantage has a limit of 25 API calls per day. You may have exceeded this limit. Try using Yahoo Finance instead."
+            return {"error": error_msg}
+
+        # Handle partial failures - proceed with available tickers
+        warning_message = None
+        adjusted_tickers = portfolio.tickers
+        adjusted_weights = portfolio.weights
+
+        if len(prices_data) != len(portfolio.tickers):
             missing_tickers = [t for t in portfolio.tickers if t not in prices_data]
-            print(f"Primary source failed or returned incomplete data. Missing tickers: {missing_tickers}. Attempting fallback...")
-            if provider.source_name == 'alpha_vantage':
-                print(f"Alpha Vantage failed for {len(missing_tickers)} ticker(s), falling back to yfinance.")
-                fallback_provider = DataProvider(source='yfinance')
-                prices_data = fallback_provider.get_prices(portfolio.tickers, start_date, end_date)
-            elif provider.source_name == 'yfinance':
-                print(f"yfinance failed for {len(missing_tickers)} ticker(s), falling back to Alpha Vantage.")
-                api_key = x_alphavantage_key or os.getenv("ALPHAVANTAGE_API_KEY")
-                if api_key:
-                    fallback_provider = DataProvider(source='alpha_vantage', api_key=api_key)
-                    prices_data = fallback_provider.get_prices(portfolio.tickers, start_date, end_date)
-                else:
-                    print("No Alpha Vantage API key available for fallback.")
+            available_tickers = [t for t in portfolio.tickers if t in prices_data]
 
-            if not prices_data or len(prices_data) == 0:
-                return {"error": f"Could not download data from any source. Please check ticker symbols ({', '.join(portfolio.tickers)}) and try again."}
+            # Calculate adjusted weights (normalize remaining weights to sum to 1.0)
+            available_indices = [i for i, t in enumerate(portfolio.tickers) if t in prices_data]
+            original_weights_sum = sum(portfolio.weights[i] for i in available_indices)
+
+            if original_weights_sum > 0:
+                adjusted_weights = [portfolio.weights[i] / original_weights_sum for i in available_indices]
+                adjusted_tickers = available_tickers
+
+                warning_message = f"⚠️ Could not fetch data for: {', '.join(missing_tickers)}. Analysis proceeds with remaining {len(available_tickers)} asset(s). Weights have been adjusted proportionally."
+                if primary_source == 'alpha_vantage':
+                    warning_message += " This may be due to Alpha Vantage rate limits or invalid ticker symbols."
+
+                print(f"\n⚠️ WARNING: Missing tickers: {missing_tickers}")
+                print(f"Proceeding with {len(available_tickers)} tickers: {available_tickers}")
+                print(f"Adjusted weights: {adjusted_weights}")
+            else:
+                error_msg = f"Could not fetch data for tickers: {', '.join(missing_tickers)}. Cannot proceed with analysis."
+                return {"error": error_msg}
 
         # Convert to DataFrame
         df_list = []
@@ -135,12 +322,12 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
 
     # Individual metrics
     individual_metrics = {}
-    for ticker in portfolio.tickers:
-        if len(portfolio.tickers) > 1:
+    for ticker in adjusted_tickers:
+        if len(adjusted_tickers) > 1:
             ticker_returns = returns[ticker]
         else:
             # Single stock: returns is already a Series for that one stock
-            ticker_returns = returns[portfolio.tickers[0]]
+            ticker_returns = returns[adjusted_tickers[0]]
 
         expected_return = float(ticker_returns.mean() * DAYS_IN_YEAR)
         volatility = float(ticker_returns.std() * np.sqrt(DAYS_IN_YEAR))
@@ -152,17 +339,17 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
         }
 
     # Portfolio metrics
-    if len(portfolio.tickers) == 1:
+    if len(adjusted_tickers) == 1:
         # Single stock: use the stock's metrics directly
-        portfolio_return = individual_metrics[portfolio.tickers[0]]["expected_annual_return"]
-        portfolio_volatility = individual_metrics[portfolio.tickers[0]]["annual_volatility"]
+        portfolio_return = individual_metrics[adjusted_tickers[0]]["expected_annual_return"]
+        portfolio_volatility = individual_metrics[adjusted_tickers[0]]["annual_volatility"]
     else:
         # Multiple stocks: calculate weighted portfolio metrics
-        portfolio_return = np.sum(returns.mean() * portfolio.weights) * DAYS_IN_YEAR
+        portfolio_return = np.sum(returns.mean() * adjusted_weights) * DAYS_IN_YEAR
         portfolio_volatility = np.sqrt(
             np.dot(
-                np.array(portfolio.weights).T,
-                np.dot(returns.cov() * DAYS_IN_YEAR, portfolio.weights)
+                np.array(adjusted_weights).T,
+                np.dot(returns.cov() * DAYS_IN_YEAR, adjusted_weights)
             )
         )
     portfolio_sharpe_ratio = (portfolio_return - RISK_FREE_RATE) / portfolio_volatility if portfolio_volatility != 0 else 0
@@ -173,15 +360,23 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
         "annual_volatility": portfolio_volatility,
         "sharpe_ratio": portfolio_sharpe_ratio
     }
-    summary = generate_summary(portfolio_metrics_dict, portfolio)
+
+    # Create a temporary portfolio object for summary generation
+    class AdjustedPortfolio:
+        def __init__(self, tickers, weights):
+            self.tickers = tickers
+            self.weights = weights
+
+    adjusted_portfolio = AdjustedPortfolio(adjusted_tickers, adjusted_weights)
+    summary = generate_summary(portfolio_metrics_dict, adjusted_portfolio)
 
     # Calculate historical CAGR from actual realized price data
-    historical_cagr = calculate_portfolio_historical_cagr(data, portfolio.weights)
+    historical_cagr = calculate_portfolio_historical_cagr(data, adjusted_weights)
 
     # Run Monte Carlo simulation for probabilistic projections
     mc_results = run_monte_carlo_simulation(
         daily_returns=returns,
-        weights=portfolio.weights,
+        weights=adjusted_weights,
         num_years=10,
         initial_value=10000
     )
@@ -193,7 +388,7 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
         "percentiles": mc_results['percentiles']
     }
 
-    return {
+    response = {
         "individual_metrics": individual_metrics,
         "portfolio_metrics": {
             "expected_annual_return": portfolio_return,
@@ -201,29 +396,90 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
             "sharpe_ratio": portfolio_sharpe_ratio
         },
         "projections": projections,
-        "weights": portfolio.weights,  # Add weights for frontend chart
-        "tickers": portfolio.tickers,   # Add tickers for reference
-        "summary": summary
+        "weights": adjusted_weights,  # Use adjusted weights
+        "tickers": adjusted_tickers,   # Use adjusted tickers
+        "summary": summary,
+        "data_sources": source_info  # Add data source information
     }
 
+    # Add warning if there were missing tickers
+    if warning_message:
+        response["warning"] = warning_message
+
+    return response
+
 def generate_summary(metrics, portfolio):
+    """
+    Generate a detailed portfolio analysis summary.
+    """
     sharpe = metrics.get('sharpe_ratio', 0)
-    
-    if sharpe < 0.5:
-        risk_profile = "a higher risk for the reward"
-    elif 0.5 <= sharpe < 1.0:
-        risk_profile = "a moderate risk-adjusted profile"
+    expected_return = metrics.get('expected_annual_return', 0)
+    volatility = metrics.get('annual_volatility', 0)
+
+    # Risk-adjusted performance assessment
+    if sharpe < 0:
+        performance = "underperforming the risk-free rate"
+        recommendation = "Consider reviewing your asset selection."
+    elif sharpe < 0.5:
+        performance = "showing poor risk-adjusted returns"
+        recommendation = "Higher risk relative to expected returns."
+    elif sharpe < 1.0:
+        performance = "demonstrating moderate risk-adjusted returns"
+        recommendation = "Acceptable performance with room for optimization."
+    elif sharpe < 2.0:
+        performance = "exhibiting strong risk-adjusted returns"
+        recommendation = "Well-balanced risk and reward profile."
     else:
-        risk_profile = "an efficient risk-adjusted profile"
+        performance = "achieving exceptional risk-adjusted returns"
+        recommendation = "Excellent diversification and asset selection."
 
-    summary = f"The portfolio has {risk_profile}."
+    # Return classification
+    if expected_return < 0.05:
+        return_level = "conservative"
+    elif expected_return < 0.10:
+        return_level = "moderate"
+    elif expected_return < 0.15:
+        return_level = "growth-oriented"
+    else:
+        return_level = "aggressive"
 
+    # Volatility assessment
+    if volatility < 0.10:
+        risk_level = "low"
+    elif volatility < 0.20:
+        risk_level = "moderate"
+    elif volatility < 0.30:
+        risk_level = "elevated"
+    else:
+        risk_level = "high"
+
+    # Build comprehensive summary
+    summary = f"This portfolio is {performance} with a Sharpe ratio of {sharpe:.2f}. "
+    summary += f"It targets a {return_level} expected return of {expected_return*100:.1f}% annually, "
+    summary += f"with {risk_level} volatility at {volatility*100:.1f}%. "
+
+    # Concentration analysis
+    num_holdings = len(portfolio.tickers)
     top_ticker_index = np.argmax(portfolio.weights)
     top_ticker = portfolio.tickers[top_ticker_index]
     top_weight = portfolio.weights[top_ticker_index]
 
-    if top_weight > 0.4:
-        summary += f" It is also concentrated in {top_ticker}, representing {top_weight * 100:.0f}% of the portfolio."
+    if num_holdings == 1:
+        summary += f"The portfolio consists of a single holding ({top_ticker}), offering no diversification benefit. "
+    elif num_holdings <= 3:
+        summary += f"With only {num_holdings} holdings, diversification is limited. "
+    elif num_holdings <= 10:
+        summary += f"The portfolio contains {num_holdings} holdings, providing reasonable diversification. "
+    else:
+        summary += f"With {num_holdings} holdings, the portfolio benefits from strong diversification. "
+
+    if top_weight > 0.5:
+        summary += f"⚠️ Highly concentrated in {top_ticker} ({top_weight*100:.0f}%), increasing single-asset risk."
+    elif top_weight > 0.3:
+        summary += f"Largest position is {top_ticker} ({top_weight*100:.0f}%)."
+
+    # Add recommendation
+    summary += f" {recommendation}"
 
     return summary
 

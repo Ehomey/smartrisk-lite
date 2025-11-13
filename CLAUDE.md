@@ -1,203 +1,97 @@
-# CLAUDE.md
+# SmartRisk Agent-Agnostic Plan
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This doc keeps every agent aligned on the product vision, current focus, and prioritized backlog. Update it whenever scope or ordering changes—no calendar dates required.
 
-## Project Overview
+---
 
-SmartRisk Lite is a portfolio risk analysis tool that calculates risk metrics for stock portfolios. It consists of:
-- **Backend**: FastAPI-based Python server that fetches stock data and performs portfolio analysis
-- **Frontend**: React + Vite application with TailwindCSS for the UI
+## Product Vision
+- Deliver an interactive portfolio cockpit that feels tactile (drag to rebalance), yet explains risk in clear language anyone can trust.
+- Combine deterministic stats (expected return, volatility, Sharpe) with Monte Carlo projections that respect real volatility and asset correlations.
+- Keep inputs approachable: comprehensive asset lists (stocks, ETFs, crypto), drag-friendly allocation editing, and intelligent data caching.
 
-## Development Commands
+---
 
-### Backend (Python/FastAPI)
+## Work Streams & Status
 
-Navigate to `Files/backend/` for all backend operations:
+### Experience (UX & React)
+- **Done**: `StockSelector` with search, asset class filter, sector filter, and drag handles backed by expanded `/popular_stocks` (236 assets: 170 stocks, 56 ETFs, 10 crypto).
+- **Done**: `PortfolioBuilder` with drag-and-drop, dynamic pie chart, individual weight editing, and auto-normalization.
+- **Done**: `ProjectionSlider` (1–10 years) with red warning beyond 5 years and always-visible disclaimer.
+- **Done**: `AdvancedProjections` collapsible Monte Carlo percentile chart (P10/P50/P90 visualization).
+- **Done**: `DataSourceInfo` component showing cache status and original data provider with color-coded badges.
+- **Done**: Enhanced `SummaryBox` renamed to "Portfolio Analysis" with detailed risk interpretation, diversification metrics, and concentration warnings.
+- **Planned**: Add initial investment and periodic contribution inputs for cash-flow-aware projections.
 
-```bash
-# Install dependencies
-pip install -r requirements.txt
+### Analytics (Backend logic)
+- **Done**: Monte Carlo percentile engine (P10/P50/P90) for 1-10 year projections with 5,000 simulated paths.
+- **Done**: Historical CAGR calculation from actual price data.
+- **Done**: Intelligent caching system (`core/cache_manager.py`) with 24-hour TTL and original source tracking.
+- **Done**: Hybrid data fetching strategy (Alpha Vantage + yfinance fallback) with rate limit handling (25 calls/day, 5 calls/min).
+- **Done**: Graceful partial failure handling - adjusts weights proportionally when tickers fail, continues analysis with available assets.
+- **Done**: Enhanced `generate_summary()` with 5-level Sharpe interpretation, return classification, volatility assessment, diversification analysis.
+- **Done**: Expanded asset database to 236 entries with `assetClass` field for filtering.
+- **Done**: Frontend warning system for Alpha Vantage limitations (25 calls/day, 5 calls/min, automatic fallback).
+- **Next Up**:
+  1. Extend `Portfolio` model + validation for `initial_investment`, `monthly_contribution`, `contribution_frequency`.
+  2. Update Monte Carlo simulations to include contributions and emit dollar projections alongside percentages.
+  3. Add `core/asset_detector.py` to automatically tag asset types (stock/ETF/crypto/bond) from yfinance metadata.
 
-# Run the backend server
-python main.py
-# Runs on http://localhost:8000
-```
+### Platform (Quality, tooling, docs)
+- **Done**: Document cache strategy, data source fallback, and partial failure handling in codebase.
+- **Queued**: Regression script/notebook to sanity-check percentile bands before deploy; base it on recorded seed portfolios.
+- **Queued**: Save/load portfolio state (localStorage) and CSV import tooling.
+- **Queued**: PDF export functionality for portfolio analysis reports.
 
-### Frontend (React/Vite)
+---
 
-Navigate to `Files/frontend/` for all frontend operations:
+## Backlog (Prioritized)
+1. Contribution-aware Monte Carlo output (dollar projections with periodic contributions, 1–10 years).
+2. Extended FastAPI schema & validation messaging for cash-flow fields.
+3. Asset-type auto-detection and sector/factor analytics visualization.
+4. Portfolio persistence (CSV import, localStorage save/load).
+5. PDF export for professional portfolio reports.
+6. Advanced risk metrics (max drawdown, Sortino ratio, tail risk analysis).
 
-```bash
-# Install dependencies
-npm install
+Items 1–2 unblock contribution-based projections; downstream tasks (3–6) enhance the analytical depth.
 
-# Run development server
-npm run dev
-# Vite will auto-select an available port (usually 5173 by default)
-# Check the terminal output for the actual URL: "Local: http://localhost:XXXX/"
+---
 
-# Build for production
-npm run build
+## Recent Improvements (Session Summary)
 
-# Lint the code
-npm run lint
-```
+### Data Source Enhancements
+- Cache now tracks original data provider (Yahoo Finance vs Alpha Vantage)
+- UI displays "Yahoo Finance (Cached)" instead of generic "Cached Data (24h)"
+- Improved transparency for users about data provenance
 
-### Running the Full Application
+### Portfolio Analysis
+- Complete rewrite of summary generation:
+  - 5-level Sharpe ratio interpretation (underperforming → exceptional)
+  - Return classification (conservative → aggressive)
+  - Volatility assessment (low → high)
+  - Concentration warnings for >50% single-asset portfolios
+  - Diversification quality analysis
+  - Actionable recommendations
+- Removed duplicate pie chart from results (PortfolioBuilder already has one)
 
-For Windows users, use the convenience scripts in the `Files/` directory:
-- `START_SmartRisk.bat` - Starts both backend and frontend servers in separate windows
-- `STOP_SmartRisk.bat` - Stops all running servers using port-based process detection
-  - Kills processes on port 8000 (backend)
-  - Kills processes on ports 517x (Vite frontend)
-  - Includes fallback methods for reliability
+### Error Handling
+- Graceful partial failures: if one ticker fails, analysis proceeds with remaining assets
+- Weights automatically adjusted proportionally
+- Clear warnings shown to user about missing tickers
+- Better error messages mentioning Alpha Vantage rate limits when applicable
 
-**Note**: The frontend port is flexible and auto-selected by Vite. Check the "SmartRisk Frontend" terminal window for the actual URL after starting.
+### Asset Coverage
+- Expanded from 66 → 236 available assets (3.5x increase)
+- Added `assetClass` field: Stock, ETF, Crypto
+- Dual filtering: Asset Class + Sector dropdowns
+- Results counter: "Showing X of 236 assets"
+- Color-coded badges (Blue=Stock, Green=ETF, Purple=Crypto)
 
-## Architecture
+---
 
-### Backend Architecture
-
-**Main Entry Point**: `Files/backend/main.py`
-- FastAPI application with single endpoint: `/analyze_portfolio`
-- Accepts portfolio tickers and weights via POST request
-- Returns calculated risk metrics and portfolio analysis
-
-**Data Adapter Pattern**: `Files/backend/core/data_adapter.py`
-- `DataProvider` class abstracts data source selection
-- Supports multiple data sources: yfinance (default) and Alpha Vantage
-- Configured via environment variables or HTTP headers
-
-**Data Sources**: `Files/backend/sources/`
-- `yfinance_source.py` - Free stock data using yfinance library
-  - **IMPORTANT**: Uses `auto_adjust=False` parameter to access 'Adj Close' column (yfinance changed default behavior)
-- `alpha_vantage_source.py` - Alternative source requiring API key
-- Backend automatically falls back between sources if one fails
-
-**Key Calculations**:
-- Daily returns from 1-year historical price data (252 trading days)
-- Annual expected return (mean daily return × 252)
-- Annual volatility (std dev of daily returns × √252)
-- Sharpe ratio: (expected return - risk-free rate) / volatility
-- Portfolio metrics use covariance matrix for multi-asset calculations
-
-### Frontend Architecture
-
-**Main App**: `Files/frontend/src/App.jsx`
-- Manages state for portfolio data, loading, and errors
-- Proxies API calls to backend via `/api` prefix (configured in vite.config.js)
-
-**Components**: `Files/frontend/src/components/`
-- `InputForm.jsx` - Portfolio ticker and weight input
-- `ChartArea.jsx` - Portfolio allocation pie chart (Chart.js)
-- `MetricsTable.jsx` - Risk metrics display table
-- `SummaryBox.jsx` - Natural language portfolio summary
-
-**Styling**: TailwindCSS with gradient backgrounds and shadow effects
-
-**API Communication**:
-- Axios for HTTP requests
-- Headers can specify data source: `X-Data-Source` and `X-AlphaVantage-Key`
-- 60-second timeout for large portfolio processing
-
-## Environment Variables
-
-Backend supports optional configuration via `.env` file in `Files/backend/`:
-
-```
-DATA_SOURCE=yfinance          # Options: yfinance, alpha_vantage
-ALPHAVANTAGE_API_KEY=your_key # Required only if using alpha_vantage
-```
-
-If not set, defaults to yfinance (no API key required).
-
-## Important Constants
-
-Located in `Files/backend/main.py`:
-- `RISK_FREE_RATE = 0.04` - 4% annual risk-free rate for Sharpe ratio
-- `DAYS_IN_YEAR = 252` - Trading days for annualization
-- `LOOKBACK_DAYS = 365` - Historical data lookback period
-- `SHARPE_THRESHOLD_LOW = 0.5` - Threshold for risk categorization
-- `SHARPE_THRESHOLD_HIGH = 1.0` - Threshold for efficient portfolios
-
-## Development Notes
-
-### Backend Development
-- The backend uses FastAPI with auto-generated docs at http://localhost:8000/docs
-- CORS is configured to allow requests from any localhost port for portability
-- Portfolio weights must sum to 1.0 (±0.01 tolerance)
-- All calculations use 1-year historical data (365 calendar days)
-
-### Frontend Development
-- Vite dev server auto-selects an available port (default 5173, but flexible)
-- Vite proxies `/api/*` requests to backend at http://localhost:8000
-  - **IMPORTANT**: Proxy uses `rewrite` rule to strip `/api` prefix before forwarding to backend
-  - Frontend calls `/api/analyze_portfolio` → Backend receives `/analyze_portfolio`
-- Frontend shows loading states during data fetching and analysis
-- Error handling includes specific messages for timeouts, connection issues, and server errors
-- Chart colors are generated dynamically based on number of tickers
-
-### Data Flow
-1. User enters tickers and weights in InputForm
-2. Frontend sends POST to `/api/analyze_portfolio` (proxied to backend)
-3. Backend fetches historical prices from data source (with fallback)
-4. Backend calculates daily returns and risk metrics
-5. Backend returns individual ticker metrics + portfolio-level metrics
-6. Frontend displays results in charts, tables, and summary
-
-### Testing Considerations
-- Example portfolio: ["AAPL", "GOOGL", "MSFT"] with equal weights [0.33, 0.33, 0.34]
-- Invalid tickers will cause backend to return error response
-- Network timeouts are set to 60 seconds for large portfolios
-- Frontend includes example portfolio load button for demos
-
-## Known Issues and Fixes
-
-### yfinance Data Fetching
-**Issue**: yfinance library changed its default `auto_adjust` parameter to `True`, which removes the 'Adj Close' column.
-
-**Fix Applied**: `Files/backend/sources/yfinance_source.py:22`
-```python
-data = yf.download(tickers, start=start, end=end, progress=False, auto_adjust=False)['Adj Close']
-```
-The `auto_adjust=False` parameter ensures the 'Adj Close' column is available.
-
-### Frontend 404 Errors
-**Issue**: Vite proxy was not stripping the `/api` prefix, causing 404 errors when the frontend called `/api/analyze_portfolio`.
-
-**Fix Applied**: `Files/frontend/vite.config.js:13`
-```javascript
-proxy: {
-  '/api': {
-    target: 'http://localhost:8000',
-    changeOrigin: true,
-    secure: false,
-    rewrite: (path) => path.replace(/^\/api/, ''),
-  },
-}
-```
-The `rewrite` rule strips `/api` prefix before forwarding to the backend.
-
-### Server Shutdown
-**Issue**: Original STOP_SmartRisk.bat relied on window titles which were unreliable.
-
-**Fix Applied**: `Files/STOP_SmartRisk.bat`
-- Now uses `netstat` to find processes listening on specific ports (8000 for backend, 517x for frontend)
-- More reliable process termination with multiple fallback methods
-
-## Troubleshooting
-
-### Backend Not Fetching Data
-1. Check that yfinance is installed: `pip install yfinance`
-2. Verify the `auto_adjust=False` parameter is set in `yfinance_source.py`
-3. Test yfinance directly in Python console to check for API issues
-
-### Frontend Can't Connect to Backend
-1. Verify backend is running on port 8000: `netstat -ano | findstr ":8000"`
-2. Check Vite proxy configuration has the `rewrite` rule
-3. Restart frontend after any vite.config.js changes
-
-### Servers Won't Stop
-1. Use the updated `STOP_SmartRisk.bat` which uses port-based detection
-2. Manually check ports: `netstat -ano | findstr ":8000"` and `netstat -ano | findstr ":517"`
-3. Use Task Manager to force-kill python.exe or node.exe processes if needed
+## Notes & Assumptions
+- Monte Carlo path count remains configurable via code constant (currently 5,000 paths).
+- Risk-free rate currently hardcoded at 4%; revisit automation after core experience is stable.
+- Cache TTL set to 24 hours to balance freshness with API rate limits.
+- Alpha Vantage free tier: 25 calls/day, 5 calls/min - system automatically falls back to yfinance.
+- Partial portfolio analysis allows users to get results even when some tickers fail.
+- Always log manual smoke test steps in PR descriptions when deploying changes that affect projections or inputs.
