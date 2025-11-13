@@ -36,7 +36,8 @@
       "WebFetch(domain:pypi.org)",
       "Bash(git remote get-url:*)",
       "Bash(test:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
