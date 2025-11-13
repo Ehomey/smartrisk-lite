@@ -18,13 +18,14 @@ function PortfolioBuilder({ portfolio, onDrop, onWeightChange, onRemoveStock }) 
 
   const handleWeightInputChange = (index, value) => {
     const numValue = parseFloat(value);
-    if (!isNaN(numValue) && numValue >= 0 && numValue <= 1) {
-      onWeightChange(index, numValue);
+    if (!isNaN(numValue) && numValue >= 0 && numValue <= 100) {
+      onWeightChange(index, numValue / 100);
     }
   };
 
   // Calculate total weight for validation
   const totalWeight = portfolio.weights.reduce((sum, w) => sum + w, 0);
+  const totalWeightPercent = totalWeight * 100;
   const isValidWeight = Math.abs(totalWeight - 1.0) < 0.01;
 
   // Generate colors for pie chart
@@ -134,12 +135,13 @@ function PortfolioBuilder({ portfolio, onDrop, onWeightChange, onRemoveStock }) 
                   <input
                     type="number"
                     min="0"
-                    max="1"
-                    step="0.01"
-                    value={portfolio.weights[index].toFixed(3)}
+                    max="100"
+                    step="0.1"
+                    value={(portfolio.weights[index] * 100).toFixed(1)}
                     onChange={(e) => handleWeightInputChange(index, e.target.value)}
                     className="w-24 px-2 py-1 border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
+                  <span className="text-sm text-gray-500 dark:text-slate-300">%</span>
                   <button
                     onClick={() => onRemoveStock(index)}
                     className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1"
@@ -160,16 +162,20 @@ function PortfolioBuilder({ portfolio, onDrop, onWeightChange, onRemoveStock }) 
           </div>
 
           {/* Weight Validation */}
-          <div className="text-sm">
+          <div className="text-sm space-y-2">
+            <div className="flex items-center justify-between text-gray-700 dark:text-slate-200">
+              <span>Total Allocation</span>
+              <span className="font-semibold">{totalWeightPercent.toFixed(1)}%</span>
+            </div>
             {!isValidWeight ? (
               <div className="text-red-600 dark:text-red-300 bg-red-50 dark:bg-red-500/10 px-3 py-2 rounded flex items-center gap-2">
                 <span role="img" aria-hidden="true">⚠️</span>
-                <span>Weights must sum to 1.0 (currently: {totalWeight.toFixed(3)})</span>
+                <span>Weights must sum to 100%. Currently {totalWeightPercent.toFixed(1)}%.</span>
               </div>
             ) : (
               <div className="text-green-600 dark:text-green-300 bg-green-50 dark:bg-green-500/10 px-3 py-2 rounded flex items-center gap-2">
                 <span role="img" aria-hidden="true">✅</span>
-                <span>Weights are valid (sum: 1.0)</span>
+                <span>Weights are valid (sum: 100%).</span>
               </div>
             )}
           </div>
@@ -188,4 +194,3 @@ function PortfolioBuilder({ portfolio, onDrop, onWeightChange, onRemoveStock }) 
 }
 
 export default PortfolioBuilder;
-

@@ -22,6 +22,8 @@ This doc keeps every agent aligned on the product vision, current focus, and pri
 - **Done**: Enhanced `SummaryBox` renamed to "Portfolio Analysis" with detailed risk interpretation, diversification metrics, and concentration warnings.
 - **Done**: Global dark-mode toggle with persisted preference plus Tailwind dark styles across every major card/table.
 - **Done**: Simulation settings UI so users can pick 5k/10k/20k Monte Carlo runs via accessible radio buttons.
+- **Done**: PortfolioBuilder now edits weights in percentages with a running 100% total indicator for clarity.
+- **Done**: StockSelector includes labeled filters, server-side pagination, a “+ Add” button, and live market lookup for tickers outside the curated list.
 - **Planned**: Add initial investment and periodic contribution inputs for cash-flow-aware projections.
 
 ### Analytics (Backend logic)
@@ -34,6 +36,7 @@ This doc keeps every agent aligned on the product vision, current focus, and pri
 - **Done**: Expanded asset database to 236 entries with `assetClass` field for filtering.
 - **Done**: Frontend warning system for Alpha Vantage limitations (25 calls/day, 5 calls/min, automatic fallback).
 - **Done**: Streaming Monte Carlo engine that processes simulations in memory-safe chunks and honors user-selected path counts.
+- **Done**: `/popular_stocks` endpoint now supports pagination + facet metadata, and `/search_assets` proxies live yfinance lookups for uncatalogued tickers.
 - **Next Up**:
   1. Extend `Portfolio` model + validation for `initial_investment`, `monthly_contribution`, `contribution_frequency`.
   2. Update Monte Carlo simulations to include contributions and emit dollar projections alongside percentages.

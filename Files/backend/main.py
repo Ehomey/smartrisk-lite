@@ -2,7 +2,7 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-from fastapi import FastAPI, Header
+from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
@@ -205,7 +205,12 @@ def validate_portfolio_inputs(tickers: List[str], weights: List[float]):
 
 # 4. API Endpoints
 @app.get("/popular_stocks")
-async def get_popular_stocks(asset_type: Optional[str] = None):
+async def get_popular_stocks(
+    asset_type: Optional[str] = Query(None, alias="asset_type"),
+    sector: Optional[str] = None,
+    page: int = 1,
+    limit: int = 60,
+):
     """
     Serves a list of popular stocks, ETFs, and crypto assets.
     Optionally filters by asset_type ('Stock', 'ETF', 'Crypto').
@@ -214,13 +219,37 @@ async def get_popular_stocks(asset_type: Optional[str] = None):
         with open(POPULAR_STOCKS_PATH, 'r') as f:
             stocks = json.load(f)
         
+        filtered = stocks
+
         if asset_type:
-            # Case-insensitive filtering
-            return [
-                stock for stock in stocks 
-                if stock.get('sector', '').lower() == asset_type.lower()
+            filtered = [
+                stock for stock in filtered
+                if stock.get('assetClass', '').lower() == asset_type.lower()
             ]
-        return stocks
+
+        if sector:
+            filtered = [
+                stock for stock in filtered
+                if stock.get('sector', '').lower() == sector.lower()
+            ]
+
+        all_asset_classes = sorted({stock.get('assetClass', 'Unknown') for stock in stocks})
+        all_sectors = sorted({stock.get('sector', 'Unknown') for stock in stocks})
+
+        limit = max(1, min(limit, 200))
+        page = max(1, page)
+        start_index = (page - 1) * limit
+        end_index = start_index + limit
+        paged = filtered[start_index:end_index]
+
+        return {
+            "items": paged,
+            "total": len(filtered),
+            "asset_classes": all_asset_classes,
+            "sectors": all_sectors,
+            "page": page,
+            "limit": limit
+        }
     except FileNotFoundError:
         return {"error": "Popular stocks file not found."}
     except Exception as e:
@@ -414,6 +443,40 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
         response["warning"] = warning_message
 
     return response
+
+@app.get("/search_assets")
+async def search_assets(query: str):
+    ticker = query.strip().upper()
+    if not ticker:
+        raise HTTPException(status_code=400, detail="Query parameter is required.")
+
+    try:
+        yf_ticker = yf.Ticker(ticker)
+        info = yf_ticker.info or {}
+    except Exception as exc:
+        raise HTTPException(status_code=404, detail=f"Unable to fetch data for {ticker}: {exc}")
+
+    if not info:
+        raise HTTPException(status_code=404, detail=f"No data found for {ticker}")
+
+    name = info.get("shortName") or info.get("longName") or ticker
+    sector = info.get("sector") or info.get("industry") or "Unknown"
+    quote_type = (info.get("quoteType") or "").lower()
+
+    if ticker.endswith("-USD") or quote_type in {"cryptocurrency", "crypto"}:
+        asset_class = "Crypto"
+    elif quote_type == "etf":
+        asset_class = "ETF"
+    else:
+        asset_class = "Stock"
+
+    return {
+        "ticker": ticker,
+        "name": name,
+        "sector": sector,
+        "assetClass": asset_class,
+        "source": "yfinance"
+    }
 
 def generate_summary(metrics, portfolio):
     """

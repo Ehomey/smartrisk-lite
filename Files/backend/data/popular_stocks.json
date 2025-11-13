@@ -1,237 +1,1538 @@
 [
-  {"ticker": "AAPL", "name": "Apple Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "MSFT", "name": "Microsoft Corporation", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "GOOGL", "name": "Alphabet Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "AMZN", "name": "Amazon.com, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "NVDA", "name": "NVIDIA Corporation", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "TSLA", "name": "Tesla, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "META", "name": "Meta Platforms, Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "JPM", "name": "JPMorgan Chase & Co.", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "JNJ", "name": "Johnson & Johnson", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "V", "name": "Visa Inc.", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "PG", "name": "Procter & Gamble Co.", "sector": "Consumer Defensive", "assetClass": "Stock"},
-  {"ticker": "MA", "name": "Mastercard Incorporated", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "UNH", "name": "UnitedHealth Group Inc.", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "HD", "name": "The Home Depot, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "BAC", "name": "Bank of America Corporation", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "PFE", "name": "Pfizer Inc.", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "KO", "name": "The Coca-Cola Company", "sector": "Consumer Defensive", "assetClass": "Stock"},
-  {"ticker": "XOM", "name": "Exxon Mobil Corporation", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "WMT", "name": "Walmart Inc.", "sector": "Consumer Defensive", "assetClass": "Stock"},
-  {"ticker": "DIS", "name": "The Walt Disney Company", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "MCD", "name": "McDonald's Corporation", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "CSCO", "name": "Cisco Systems, Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "ADBE", "name": "Adobe Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "CRM", "name": "Salesforce, Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "NFLX", "name": "Netflix, Inc.", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "NKE", "name": "NIKE, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "COST", "name": "Costco Wholesale Corporation", "sector": "Consumer Defensive", "assetClass": "Stock"},
-  {"ticker": "PEP", "name": "PepsiCo, Inc.", "sector": "Consumer Defensive", "assetClass": "Stock"},
-  {"ticker": "TMO", "name": "Thermo Fisher Scientific Inc.", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "AVGO", "name": "Broadcom Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "ORCL", "name": "Oracle Corporation", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "ABT", "name": "Abbott Laboratories", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "CVX", "name": "Chevron Corporation", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "IBM", "name": "International Business Machines", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "AMD", "name": "Advanced Micro Devices, Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "QCOM", "name": "QUALCOMM Incorporated", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "INTC", "name": "Intel Corporation", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "SBUX", "name": "Starbucks Corporation", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "GS", "name": "The Goldman Sachs Group, Inc.", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "BA", "name": "The Boeing Company", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "CAT", "name": "Caterpillar Inc.", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "GE", "name": "General Electric Company", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "MMM", "name": "3M Company", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "AXP", "name": "American Express Company", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "UBER", "name": "Uber Technologies, Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "PYPL", "name": "PayPal Holdings, Inc.", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "T", "name": "AT&T Inc.", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "VZ", "name": "Verizon Communications Inc.", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "F", "name": "Ford Motor Company", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "GM", "name": "General Motors Company", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "C", "name": "Citigroup Inc.", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "WFC", "name": "Wells Fargo & Company", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "MS", "name": "Morgan Stanley", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "BLK", "name": "BlackRock, Inc.", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "SCHW", "name": "Charles Schwab Corporation", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "AIG", "name": "American International Group", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "MET", "name": "MetLife, Inc.", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "PRU", "name": "Prudential Financial, Inc.", "sector": "Financial Services", "assetClass": "Stock"},
-  {"ticker": "GILD", "name": "Gilead Sciences, Inc.", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "AMGN", "name": "Amgen Inc.", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "BMY", "name": "Bristol-Myers Squibb Company", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "MRK", "name": "Merck & Co., Inc.", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "LLY", "name": "Eli Lilly and Company", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "ABBV", "name": "AbbVie Inc.", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "CVS", "name": "CVS Health Corporation", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "CI", "name": "Cigna Corporation", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "MDLZ", "name": "Mondelez International, Inc.", "sector": "Consumer Defensive", "assetClass": "Stock"},
-  {"ticker": "CL", "name": "Colgate-Palmolive Company", "sector": "Consumer Defensive", "assetClass": "Stock"},
-  {"ticker": "KMB", "name": "Kimberly-Clark Corporation", "sector": "Consumer Defensive", "assetClass": "Stock"},
-  {"ticker": "GIS", "name": "General Mills, Inc.", "sector": "Consumer Defensive", "assetClass": "Stock"},
-  {"ticker": "K", "name": "Kellogg Company", "sector": "Consumer Defensive", "assetClass": "Stock"},
-  {"ticker": "TGT", "name": "Target Corporation", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "LOW", "name": "Lowe's Companies, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "TJX", "name": "The TJX Companies, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "CMG", "name": "Chipotle Mexican Grill, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "YUM", "name": "Yum! Brands, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "BKNG", "name": "Booking Holdings Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "MAR", "name": "Marriott International, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "HLT", "name": "Hilton Worldwide Holdings Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "CCL", "name": "Carnival Corporation", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "RCL", "name": "Royal Caribbean Group", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "NCLH", "name": "Norwegian Cruise Line Holdings", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "LUV", "name": "Southwest Airlines Co.", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "DAL", "name": "Delta Air Lines, Inc.", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "UAL", "name": "United Airlines Holdings, Inc.", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "AAL", "name": "American Airlines Group Inc.", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "UPS", "name": "United Parcel Service, Inc.", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "FDX", "name": "FedEx Corporation", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "DE", "name": "Deere & Company", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "HON", "name": "Honeywell International Inc.", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "LMT", "name": "Lockheed Martin Corporation", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "RTX", "name": "RTX Corporation", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "NOC", "name": "Northrop Grumman Corporation", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "GD", "name": "General Dynamics Corporation", "sector": "Industrials", "assetClass": "Stock"},
-  {"ticker": "NEE", "name": "NextEra Energy, Inc.", "sector": "Utilities", "assetClass": "Stock"},
-  {"ticker": "DUK", "name": "Duke Energy Corporation", "sector": "Utilities", "assetClass": "Stock"},
-  {"ticker": "SO", "name": "Southern Company", "sector": "Utilities", "assetClass": "Stock"},
-  {"ticker": "D", "name": "Dominion Energy, Inc.", "sector": "Utilities", "assetClass": "Stock"},
-  {"ticker": "EXC", "name": "Exelon Corporation", "sector": "Utilities", "assetClass": "Stock"},
-  {"ticker": "SRE", "name": "Sempra", "sector": "Utilities", "assetClass": "Stock"},
-  {"ticker": "AMT", "name": "American Tower Corporation", "sector": "Real Estate", "assetClass": "Stock"},
-  {"ticker": "PLD", "name": "Prologis, Inc.", "sector": "Real Estate", "assetClass": "Stock"},
-  {"ticker": "CCI", "name": "Crown Castle Inc.", "sector": "Real Estate", "assetClass": "Stock"},
-  {"ticker": "EQIX", "name": "Equinix, Inc.", "sector": "Real Estate", "assetClass": "Stock"},
-  {"ticker": "PSA", "name": "Public Storage", "sector": "Real Estate", "assetClass": "Stock"},
-  {"ticker": "O", "name": "Realty Income Corporation", "sector": "Real Estate", "assetClass": "Stock"},
-  {"ticker": "SPG", "name": "Simon Property Group, Inc.", "sector": "Real Estate", "assetClass": "Stock"},
-  {"ticker": "AVB", "name": "AvalonBay Communities, Inc.", "sector": "Real Estate", "assetClass": "Stock"},
-  {"ticker": "EQR", "name": "Equity Residential", "sector": "Real Estate", "assetClass": "Stock"},
-  {"ticker": "SLB", "name": "Schlumberger Limited", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "COP", "name": "ConocoPhillips", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "EOG", "name": "EOG Resources, Inc.", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "PSX", "name": "Phillips 66", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "MPC", "name": "Marathon Petroleum Corporation", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "VLO", "name": "Valero Energy Corporation", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "OXY", "name": "Occidental Petroleum Corporation", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "HAL", "name": "Halliburton Company", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "BKR", "name": "Baker Hughes Company", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "FCX", "name": "Freeport-McMoRan Inc.", "sector": "Basic Materials", "assetClass": "Stock"},
-  {"ticker": "NEM", "name": "Newmont Corporation", "sector": "Basic Materials", "assetClass": "Stock"},
-  {"ticker": "DD", "name": "DuPont de Nemours, Inc.", "sector": "Basic Materials", "assetClass": "Stock"},
-  {"ticker": "DOW", "name": "Dow Inc.", "sector": "Basic Materials", "assetClass": "Stock"},
-  {"ticker": "LYB", "name": "LyondellBasell Industries N.V.", "sector": "Basic Materials", "assetClass": "Stock"},
-  {"ticker": "ECL", "name": "Ecolab Inc.", "sector": "Basic Materials", "assetClass": "Stock"},
-  {"ticker": "APD", "name": "Air Products and Chemicals, Inc.", "sector": "Basic Materials", "assetClass": "Stock"},
-  {"ticker": "SHW", "name": "The Sherwin-Williams Company", "sector": "Basic Materials", "assetClass": "Stock"},
-  {"ticker": "NUE", "name": "Nucor Corporation", "sector": "Basic Materials", "assetClass": "Stock"},
-  {"ticker": "CMCSA", "name": "Comcast Corporation", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "CHTR", "name": "Charter Communications, Inc.", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "TMUS", "name": "T-Mobile US, Inc.", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "EA", "name": "Electronic Arts Inc.", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "ATVI", "name": "Activision Blizzard, Inc.", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "TTWO", "name": "Take-Two Interactive Software", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "SPOT", "name": "Spotify Technology S.A.", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "SNAP", "name": "Snap Inc.", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "PINS", "name": "Pinterest, Inc.", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "TWTR", "name": "Twitter, Inc.", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "ZM", "name": "Zoom Video Communications, Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "DOCU", "name": "DocuSign, Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "SQ", "name": "Block, Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "SHOP", "name": "Shopify Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "SNOW", "name": "Snowflake Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "PLTR", "name": "Palantir Technologies Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "U", "name": "Unity Software Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "RBLX", "name": "Roblox Corporation", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "COIN", "name": "Coinbase Global, Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "ABNB", "name": "Airbnb, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "DASH", "name": "DoorDash, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "LYFT", "name": "Lyft, Inc.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "RIVN", "name": "Rivian Automotive, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "LCID", "name": "Lucid Group, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "NIO", "name": "NIO Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "XPEV", "name": "XPeng Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "LI", "name": "Li Auto Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "BABA", "name": "Alibaba Group Holding Limited", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "JD", "name": "JD.com, Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "PDD", "name": "PDD Holdings Inc.", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "BIDU", "name": "Baidu, Inc.", "sector": "Communication Services", "assetClass": "Stock"},
-  {"ticker": "TSM", "name": "Taiwan Semiconductor Manufacturing", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "ASML", "name": "ASML Holding N.V.", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "SAP", "name": "SAP SE", "sector": "Technology", "assetClass": "Stock"},
-  {"ticker": "TM", "name": "Toyota Motor Corporation", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "SNE", "name": "Sony Group Corporation", "sector": "Consumer Cyclical", "assetClass": "Stock"},
-  {"ticker": "NVO", "name": "Novo Nordisk A/S", "sector": "Healthcare", "assetClass": "Stock"},
-  {"ticker": "UL", "name": "Unilever PLC", "sector": "Consumer Defensive", "assetClass": "Stock"},
-  {"ticker": "BP", "name": "BP p.l.c.", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "SHEL", "name": "Shell plc", "sector": "Energy", "assetClass": "Stock"},
-  {"ticker": "RIO", "name": "Rio Tinto Group", "sector": "Basic Materials", "assetClass": "Stock"},
-  {"ticker": "BHP", "name": "BHP Group Limited", "sector": "Basic Materials", "assetClass": "Stock"},
-
-  {"ticker": "SPY", "name": "SPDR S&P 500 ETF Trust", "sector": "Large Cap", "assetClass": "ETF"},
-  {"ticker": "QQQ", "name": "Invesco QQQ Trust", "sector": "Technology", "assetClass": "ETF"},
-  {"ticker": "VTI", "name": "Vanguard Total Stock Market ETF", "sector": "Total Market", "assetClass": "ETF"},
-  {"ticker": "VOO", "name": "Vanguard S&P 500 ETF", "sector": "Large Cap", "assetClass": "ETF"},
-  {"ticker": "IWM", "name": "iShares Russell 2000 ETF", "sector": "Small Cap", "assetClass": "ETF"},
-  {"ticker": "EEM", "name": "iShares MSCI Emerging Markets ETF", "sector": "Emerging Markets", "assetClass": "ETF"},
-  {"ticker": "VEA", "name": "Vanguard FTSE Developed Markets ETF", "sector": "International", "assetClass": "ETF"},
-  {"ticker": "AGG", "name": "iShares Core U.S. Aggregate Bond ETF", "sector": "Fixed Income", "assetClass": "ETF"},
-  {"ticker": "BND", "name": "Vanguard Total Bond Market ETF", "sector": "Fixed Income", "assetClass": "ETF"},
-  {"ticker": "LQD", "name": "iShares iBoxx Investment Grade Corp Bond ETF", "sector": "Corporate Bonds", "assetClass": "ETF"},
-  {"ticker": "HYG", "name": "iShares iBoxx High Yield Corporate Bond ETF", "sector": "High Yield", "assetClass": "ETF"},
-  {"ticker": "TLT", "name": "iShares 20+ Year Treasury Bond ETF", "sector": "Treasuries", "assetClass": "ETF"},
-  {"ticker": "SHY", "name": "iShares 1-3 Year Treasury Bond ETF", "sector": "Treasuries", "assetClass": "ETF"},
-  {"ticker": "GLD", "name": "SPDR Gold Shares", "sector": "Commodities", "assetClass": "ETF"},
-  {"ticker": "SLV", "name": "iShares Silver Trust", "sector": "Commodities", "assetClass": "ETF"},
-  {"ticker": "USO", "name": "United States Oil Fund", "sector": "Energy", "assetClass": "ETF"},
-  {"ticker": "VNQ", "name": "Vanguard Real Estate ETF", "sector": "Real Estate", "assetClass": "ETF"},
-  {"ticker": "XLF", "name": "Financial Select Sector SPDR Fund", "sector": "Financial Services", "assetClass": "ETF"},
-  {"ticker": "XLK", "name": "Technology Select Sector SPDR Fund", "sector": "Technology", "assetClass": "ETF"},
-  {"ticker": "XLE", "name": "Energy Select Sector SPDR Fund", "sector": "Energy", "assetClass": "ETF"},
-  {"ticker": "XLV", "name": "Health Care Select Sector SPDR Fund", "sector": "Healthcare", "assetClass": "ETF"},
-  {"ticker": "XLI", "name": "Industrial Select Sector SPDR Fund", "sector": "Industrials", "assetClass": "ETF"},
-  {"ticker": "XLP", "name": "Consumer Staples Select Sector SPDR", "sector": "Consumer Defensive", "assetClass": "ETF"},
-  {"ticker": "XLY", "name": "Consumer Discretionary Select Sector", "sector": "Consumer Cyclical", "assetClass": "ETF"},
-  {"ticker": "XLU", "name": "Utilities Select Sector SPDR Fund", "sector": "Utilities", "assetClass": "ETF"},
-  {"ticker": "XLB", "name": "Materials Select Sector SPDR Fund", "sector": "Basic Materials", "assetClass": "ETF"},
-  {"ticker": "XLRE", "name": "Real Estate Select Sector SPDR Fund", "sector": "Real Estate", "assetClass": "ETF"},
-  {"ticker": "VGT", "name": "Vanguard Information Technology ETF", "sector": "Technology", "assetClass": "ETF"},
-  {"ticker": "VHT", "name": "Vanguard Health Care ETF", "sector": "Healthcare", "assetClass": "ETF"},
-  {"ticker": "VFH", "name": "Vanguard Financials ETF", "sector": "Financial Services", "assetClass": "ETF"},
-  {"ticker": "VDE", "name": "Vanguard Energy ETF", "sector": "Energy", "assetClass": "ETF"},
-  {"ticker": "VAW", "name": "Vanguard Materials ETF", "sector": "Basic Materials", "assetClass": "ETF"},
-  {"ticker": "VIS", "name": "Vanguard Industrials ETF", "sector": "Industrials", "assetClass": "ETF"},
-  {"ticker": "VCR", "name": "Vanguard Consumer Discretionary ETF", "sector": "Consumer Cyclical", "assetClass": "ETF"},
-  {"ticker": "VDC", "name": "Vanguard Consumer Staples ETF", "sector": "Consumer Defensive", "assetClass": "ETF"},
-  {"ticker": "VPU", "name": "Vanguard Utilities ETF", "sector": "Utilities", "assetClass": "ETF"},
-  {"ticker": "ARKK", "name": "ARK Innovation ETF", "sector": "Innovation", "assetClass": "ETF"},
-  {"ticker": "ARKW", "name": "ARK Next Generation Internet ETF", "sector": "Technology", "assetClass": "ETF"},
-  {"ticker": "ARKG", "name": "ARK Genomic Revolution ETF", "sector": "Healthcare", "assetClass": "ETF"},
-  {"ticker": "ARKQ", "name": "ARK Autonomous Technology & Robotics ETF", "sector": "Technology", "assetClass": "ETF"},
-  {"ticker": "ARKF", "name": "ARK Fintech Innovation ETF", "sector": "Financial Services", "assetClass": "ETF"},
-  {"ticker": "ICLN", "name": "iShares Global Clean Energy ETF", "sector": "Clean Energy", "assetClass": "ETF"},
-  {"ticker": "TAN", "name": "Invesco Solar ETF", "sector": "Solar Energy", "assetClass": "ETF"},
-  {"ticker": "BOTZ", "name": "Global X Robotics & AI ETF", "sector": "AI & Robotics", "assetClass": "ETF"},
-  {"ticker": "ESPO", "name": "VanEck Video Gaming and eSports ETF", "sector": "Gaming", "assetClass": "ETF"},
-  {"ticker": "HERO", "name": "Global X Video Games & Esports ETF", "sector": "Gaming", "assetClass": "ETF"},
-  {"ticker": "CIBR", "name": "First Trust NASDAQ Cybersecurity ETF", "sector": "Cybersecurity", "assetClass": "ETF"},
-  {"ticker": "HACK", "name": "ETFMG Prime Cyber Security ETF", "sector": "Cybersecurity", "assetClass": "ETF"},
-  {"ticker": "SKYY", "name": "First Trust Cloud Computing ETF", "sector": "Cloud Computing", "assetClass": "ETF"},
-  {"ticker": "CLOU", "name": "Global X Cloud Computing ETF", "sector": "Cloud Computing", "assetClass": "ETF"},
-  {"ticker": "SOXX", "name": "iShares Semiconductor ETF", "sector": "Semiconductors", "assetClass": "ETF"},
-  {"ticker": "SMH", "name": "VanEck Semiconductor ETF", "sector": "Semiconductors", "assetClass": "ETF"},
-  {"ticker": "IBB", "name": "iShares Biotechnology ETF", "sector": "Biotechnology", "assetClass": "ETF"},
-  {"ticker": "XBI", "name": "SPDR S&P Biotech ETF", "sector": "Biotechnology", "assetClass": "ETF"},
-
-  {"ticker": "BTC-USD", "name": "Bitcoin", "sector": "Cryptocurrency", "assetClass": "Crypto"},
-  {"ticker": "ETH-USD", "name": "Ethereum", "sector": "Cryptocurrency", "assetClass": "Crypto"},
-  {"ticker": "BNB-USD", "name": "Binance Coin", "sector": "Cryptocurrency", "assetClass": "Crypto"},
-  {"ticker": "ADA-USD", "name": "Cardano", "sector": "Cryptocurrency", "assetClass": "Crypto"},
-  {"ticker": "SOL-USD", "name": "Solana", "sector": "Cryptocurrency", "assetClass": "Crypto"},
-  {"ticker": "XRP-USD", "name": "Ripple", "sector": "Cryptocurrency", "assetClass": "Crypto"},
-  {"ticker": "DOT-USD", "name": "Polkadot", "sector": "Cryptocurrency", "assetClass": "Crypto"},
-  {"ticker": "DOGE-USD", "name": "Dogecoin", "sector": "Cryptocurrency", "assetClass": "Crypto"},
-  {"ticker": "MATIC-USD", "name": "Polygon", "sector": "Cryptocurrency", "assetClass": "Crypto"},
-  {"ticker": "LINK-USD", "name": "Chainlink", "sector": "Cryptocurrency", "assetClass": "Crypto"}
+  {
+    "ticker": "AAPL",
+    "name": "Apple Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "MSFT",
+    "name": "Microsoft Corporation",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "GOOGL",
+    "name": "Alphabet Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "AMZN",
+    "name": "Amazon.com, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "NVDA",
+    "name": "NVIDIA Corporation",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "TSLA",
+    "name": "Tesla, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "META",
+    "name": "Meta Platforms, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "JPM",
+    "name": "JPMorgan Chase & Co.",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "JNJ",
+    "name": "Johnson & Johnson",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "V",
+    "name": "Visa Inc.",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PG",
+    "name": "Procter & Gamble Co.",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "MA",
+    "name": "Mastercard Incorporated",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "UNH",
+    "name": "UnitedHealth Group Inc.",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "HD",
+    "name": "The Home Depot, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "BAC",
+    "name": "Bank of America Corporation",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PFE",
+    "name": "Pfizer Inc.",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "KO",
+    "name": "The Coca-Cola Company",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "XOM",
+    "name": "Exxon Mobil Corporation",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "WMT",
+    "name": "Walmart Inc.",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "DIS",
+    "name": "The Walt Disney Company",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "MCD",
+    "name": "McDonald's Corporation",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CSCO",
+    "name": "Cisco Systems, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ADBE",
+    "name": "Adobe Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CRM",
+    "name": "Salesforce, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "NFLX",
+    "name": "Netflix, Inc.",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "NKE",
+    "name": "NIKE, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "COST",
+    "name": "Costco Wholesale Corporation",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PEP",
+    "name": "PepsiCo, Inc.",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "TMO",
+    "name": "Thermo Fisher Scientific Inc.",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "AVGO",
+    "name": "Broadcom Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ORCL",
+    "name": "Oracle Corporation",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ABT",
+    "name": "Abbott Laboratories",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CVX",
+    "name": "Chevron Corporation",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "IBM",
+    "name": "International Business Machines",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "AMD",
+    "name": "Advanced Micro Devices, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "QCOM",
+    "name": "QUALCOMM Incorporated",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "INTC",
+    "name": "Intel Corporation",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SBUX",
+    "name": "Starbucks Corporation",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "GS",
+    "name": "The Goldman Sachs Group, Inc.",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "BA",
+    "name": "The Boeing Company",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CAT",
+    "name": "Caterpillar Inc.",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "GE",
+    "name": "General Electric Company",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "MMM",
+    "name": "3M Company",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "AXP",
+    "name": "American Express Company",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "UBER",
+    "name": "Uber Technologies, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PYPL",
+    "name": "PayPal Holdings, Inc.",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "T",
+    "name": "AT&T Inc.",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "VZ",
+    "name": "Verizon Communications Inc.",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "F",
+    "name": "Ford Motor Company",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "GM",
+    "name": "General Motors Company",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "C",
+    "name": "Citigroup Inc.",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "WFC",
+    "name": "Wells Fargo & Company",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "MS",
+    "name": "Morgan Stanley",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "BLK",
+    "name": "BlackRock, Inc.",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SCHW",
+    "name": "Charles Schwab Corporation",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "AIG",
+    "name": "American International Group",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "MET",
+    "name": "MetLife, Inc.",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PRU",
+    "name": "Prudential Financial, Inc.",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "GILD",
+    "name": "Gilead Sciences, Inc.",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "AMGN",
+    "name": "Amgen Inc.",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "BMY",
+    "name": "Bristol-Myers Squibb Company",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "MRK",
+    "name": "Merck & Co., Inc.",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "LLY",
+    "name": "Eli Lilly and Company",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ABBV",
+    "name": "AbbVie Inc.",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CVS",
+    "name": "CVS Health Corporation",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CI",
+    "name": "Cigna Corporation",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "MDLZ",
+    "name": "Mondelez International, Inc.",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CL",
+    "name": "Colgate-Palmolive Company",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "KMB",
+    "name": "Kimberly-Clark Corporation",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "GIS",
+    "name": "General Mills, Inc.",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "K",
+    "name": "Kellogg Company",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "TGT",
+    "name": "Target Corporation",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "LOW",
+    "name": "Lowe's Companies, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "TJX",
+    "name": "The TJX Companies, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CMG",
+    "name": "Chipotle Mexican Grill, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "YUM",
+    "name": "Yum! Brands, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "BKNG",
+    "name": "Booking Holdings Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "MAR",
+    "name": "Marriott International, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "HLT",
+    "name": "Hilton Worldwide Holdings Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CCL",
+    "name": "Carnival Corporation",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "RCL",
+    "name": "Royal Caribbean Group",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "NCLH",
+    "name": "Norwegian Cruise Line Holdings",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "LUV",
+    "name": "Southwest Airlines Co.",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "DAL",
+    "name": "Delta Air Lines, Inc.",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "UAL",
+    "name": "United Airlines Holdings, Inc.",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "AAL",
+    "name": "American Airlines Group Inc.",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "UPS",
+    "name": "United Parcel Service, Inc.",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "FDX",
+    "name": "FedEx Corporation",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "DE",
+    "name": "Deere & Company",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "HON",
+    "name": "Honeywell International Inc.",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "LMT",
+    "name": "Lockheed Martin Corporation",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "RTX",
+    "name": "RTX Corporation",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "NOC",
+    "name": "Northrop Grumman Corporation",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "GD",
+    "name": "General Dynamics Corporation",
+    "sector": "Industrials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "NEE",
+    "name": "NextEra Energy, Inc.",
+    "sector": "Utilities",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "DUK",
+    "name": "Duke Energy Corporation",
+    "sector": "Utilities",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SO",
+    "name": "Southern Company",
+    "sector": "Utilities",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "D",
+    "name": "Dominion Energy, Inc.",
+    "sector": "Utilities",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "EXC",
+    "name": "Exelon Corporation",
+    "sector": "Utilities",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SRE",
+    "name": "Sempra",
+    "sector": "Utilities",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "AMT",
+    "name": "American Tower Corporation",
+    "sector": "Real Estate",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PLD",
+    "name": "Prologis, Inc.",
+    "sector": "Real Estate",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CCI",
+    "name": "Crown Castle Inc.",
+    "sector": "Real Estate",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "EQIX",
+    "name": "Equinix, Inc.",
+    "sector": "Real Estate",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PSA",
+    "name": "Public Storage",
+    "sector": "Real Estate",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "O",
+    "name": "Realty Income Corporation",
+    "sector": "Real Estate",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SPG",
+    "name": "Simon Property Group, Inc.",
+    "sector": "Real Estate",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "AVB",
+    "name": "AvalonBay Communities, Inc.",
+    "sector": "Real Estate",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "EQR",
+    "name": "Equity Residential",
+    "sector": "Real Estate",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SLB",
+    "name": "Schlumberger Limited",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "COP",
+    "name": "ConocoPhillips",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "EOG",
+    "name": "EOG Resources, Inc.",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PSX",
+    "name": "Phillips 66",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "MPC",
+    "name": "Marathon Petroleum Corporation",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "VLO",
+    "name": "Valero Energy Corporation",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "OXY",
+    "name": "Occidental Petroleum Corporation",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "HAL",
+    "name": "Halliburton Company",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "BKR",
+    "name": "Baker Hughes Company",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "FCX",
+    "name": "Freeport-McMoRan Inc.",
+    "sector": "Basic Materials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "NEM",
+    "name": "Newmont Corporation",
+    "sector": "Basic Materials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "DD",
+    "name": "DuPont de Nemours, Inc.",
+    "sector": "Basic Materials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "DOW",
+    "name": "Dow Inc.",
+    "sector": "Basic Materials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "LYB",
+    "name": "LyondellBasell Industries N.V.",
+    "sector": "Basic Materials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ECL",
+    "name": "Ecolab Inc.",
+    "sector": "Basic Materials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "APD",
+    "name": "Air Products and Chemicals, Inc.",
+    "sector": "Basic Materials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SHW",
+    "name": "The Sherwin-Williams Company",
+    "sector": "Basic Materials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "NUE",
+    "name": "Nucor Corporation",
+    "sector": "Basic Materials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CMCSA",
+    "name": "Comcast Corporation",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CHTR",
+    "name": "Charter Communications, Inc.",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "TMUS",
+    "name": "T-Mobile US, Inc.",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "EA",
+    "name": "Electronic Arts Inc.",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ATVI",
+    "name": "Activision Blizzard, Inc.",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "TTWO",
+    "name": "Take-Two Interactive Software",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SPOT",
+    "name": "Spotify Technology S.A.",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SNAP",
+    "name": "Snap Inc.",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PINS",
+    "name": "Pinterest, Inc.",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "TWTR",
+    "name": "Twitter, Inc.",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ZM",
+    "name": "Zoom Video Communications, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "DOCU",
+    "name": "DocuSign, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SQ",
+    "name": "Block, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SHOP",
+    "name": "Shopify Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SNOW",
+    "name": "Snowflake Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PLTR",
+    "name": "Palantir Technologies Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "U",
+    "name": "Unity Software Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "RBLX",
+    "name": "Roblox Corporation",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "COIN",
+    "name": "Coinbase Global, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ABNB",
+    "name": "Airbnb, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "DASH",
+    "name": "DoorDash, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "LYFT",
+    "name": "Lyft, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "RIVN",
+    "name": "Rivian Automotive, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "LCID",
+    "name": "Lucid Group, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "NIO",
+    "name": "NIO Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "XPEV",
+    "name": "XPeng Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "LI",
+    "name": "Li Auto Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "BABA",
+    "name": "Alibaba Group Holding Limited",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "JD",
+    "name": "JD.com, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PDD",
+    "name": "PDD Holdings Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "BIDU",
+    "name": "Baidu, Inc.",
+    "sector": "Communication Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "TSM",
+    "name": "Taiwan Semiconductor Manufacturing",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ASML",
+    "name": "ASML Holding N.V.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SAP",
+    "name": "SAP SE",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "TM",
+    "name": "Toyota Motor Corporation",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SNE",
+    "name": "Sony Group Corporation",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "NVO",
+    "name": "Novo Nordisk A/S",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "UL",
+    "name": "Unilever PLC",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "BP",
+    "name": "BP p.l.c.",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SHEL",
+    "name": "Shell plc",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "RIO",
+    "name": "Rio Tinto Group",
+    "sector": "Basic Materials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "BHP",
+    "name": "BHP Group Limited",
+    "sector": "Basic Materials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SPY",
+    "name": "SPDR S&P 500 ETF Trust",
+    "sector": "Large Cap",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "QQQ",
+    "name": "Invesco QQQ Trust",
+    "sector": "Technology",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VTI",
+    "name": "Vanguard Total Stock Market ETF",
+    "sector": "Total Market",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VOO",
+    "name": "Vanguard S&P 500 ETF",
+    "sector": "Large Cap",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "IWM",
+    "name": "iShares Russell 2000 ETF",
+    "sector": "Small Cap",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "EEM",
+    "name": "iShares MSCI Emerging Markets ETF",
+    "sector": "Emerging Markets",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VEA",
+    "name": "Vanguard FTSE Developed Markets ETF",
+    "sector": "International",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "AGG",
+    "name": "iShares Core U.S. Aggregate Bond ETF",
+    "sector": "Fixed Income",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "BND",
+    "name": "Vanguard Total Bond Market ETF",
+    "sector": "Fixed Income",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "LQD",
+    "name": "iShares iBoxx Investment Grade Corp Bond ETF",
+    "sector": "Corporate Bonds",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "HYG",
+    "name": "iShares iBoxx High Yield Corporate Bond ETF",
+    "sector": "High Yield",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "TLT",
+    "name": "iShares 20+ Year Treasury Bond ETF",
+    "sector": "Treasuries",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "SHY",
+    "name": "iShares 1-3 Year Treasury Bond ETF",
+    "sector": "Treasuries",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "GLD",
+    "name": "SPDR Gold Shares",
+    "sector": "Commodities",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "SLV",
+    "name": "iShares Silver Trust",
+    "sector": "Commodities",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "USO",
+    "name": "United States Oil Fund",
+    "sector": "Energy",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VNQ",
+    "name": "Vanguard Real Estate ETF",
+    "sector": "Real Estate",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "XLF",
+    "name": "Financial Select Sector SPDR Fund",
+    "sector": "Financial Services",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "XLK",
+    "name": "Technology Select Sector SPDR Fund",
+    "sector": "Technology",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "XLE",
+    "name": "Energy Select Sector SPDR Fund",
+    "sector": "Energy",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "XLV",
+    "name": "Health Care Select Sector SPDR Fund",
+    "sector": "Healthcare",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "XLI",
+    "name": "Industrial Select Sector SPDR Fund",
+    "sector": "Industrials",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "XLP",
+    "name": "Consumer Staples Select Sector SPDR",
+    "sector": "Consumer Defensive",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "XLY",
+    "name": "Consumer Discretionary Select Sector",
+    "sector": "Consumer Cyclical",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "XLU",
+    "name": "Utilities Select Sector SPDR Fund",
+    "sector": "Utilities",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "XLB",
+    "name": "Materials Select Sector SPDR Fund",
+    "sector": "Basic Materials",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "XLRE",
+    "name": "Real Estate Select Sector SPDR Fund",
+    "sector": "Real Estate",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VGT",
+    "name": "Vanguard Information Technology ETF",
+    "sector": "Technology",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VHT",
+    "name": "Vanguard Health Care ETF",
+    "sector": "Healthcare",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VFH",
+    "name": "Vanguard Financials ETF",
+    "sector": "Financial Services",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VDE",
+    "name": "Vanguard Energy ETF",
+    "sector": "Energy",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VAW",
+    "name": "Vanguard Materials ETF",
+    "sector": "Basic Materials",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VIS",
+    "name": "Vanguard Industrials ETF",
+    "sector": "Industrials",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VCR",
+    "name": "Vanguard Consumer Discretionary ETF",
+    "sector": "Consumer Cyclical",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VDC",
+    "name": "Vanguard Consumer Staples ETF",
+    "sector": "Consumer Defensive",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "VPU",
+    "name": "Vanguard Utilities ETF",
+    "sector": "Utilities",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "ARKK",
+    "name": "ARK Innovation ETF",
+    "sector": "Innovation",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "ARKW",
+    "name": "ARK Next Generation Internet ETF",
+    "sector": "Technology",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "ARKG",
+    "name": "ARK Genomic Revolution ETF",
+    "sector": "Healthcare",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "ARKQ",
+    "name": "ARK Autonomous Technology & Robotics ETF",
+    "sector": "Technology",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "ARKF",
+    "name": "ARK Fintech Innovation ETF",
+    "sector": "Financial Services",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "ICLN",
+    "name": "iShares Global Clean Energy ETF",
+    "sector": "Clean Energy",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "TAN",
+    "name": "Invesco Solar ETF",
+    "sector": "Solar Energy",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "BOTZ",
+    "name": "Global X Robotics & AI ETF",
+    "sector": "AI & Robotics",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "ESPO",
+    "name": "VanEck Video Gaming and eSports ETF",
+    "sector": "Gaming",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "HERO",
+    "name": "Global X Video Games & Esports ETF",
+    "sector": "Gaming",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "CIBR",
+    "name": "First Trust NASDAQ Cybersecurity ETF",
+    "sector": "Cybersecurity",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "HACK",
+    "name": "ETFMG Prime Cyber Security ETF",
+    "sector": "Cybersecurity",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "SKYY",
+    "name": "First Trust Cloud Computing ETF",
+    "sector": "Cloud Computing",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "CLOU",
+    "name": "Global X Cloud Computing ETF",
+    "sector": "Cloud Computing",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "SOXX",
+    "name": "iShares Semiconductor ETF",
+    "sector": "Semiconductors",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "SMH",
+    "name": "VanEck Semiconductor ETF",
+    "sector": "Semiconductors",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "IBB",
+    "name": "iShares Biotechnology ETF",
+    "sector": "Biotechnology",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "XBI",
+    "name": "SPDR S&P Biotech ETF",
+    "sector": "Biotechnology",
+    "assetClass": "ETF"
+  },
+  {
+    "ticker": "BTC-USD",
+    "name": "Bitcoin",
+    "sector": "Cryptocurrency",
+    "assetClass": "Crypto"
+  },
+  {
+    "ticker": "ETH-USD",
+    "name": "Ethereum",
+    "sector": "Cryptocurrency",
+    "assetClass": "Crypto"
+  },
+  {
+    "ticker": "BNB-USD",
+    "name": "Binance Coin",
+    "sector": "Cryptocurrency",
+    "assetClass": "Crypto"
+  },
+  {
+    "ticker": "ADA-USD",
+    "name": "Cardano",
+    "sector": "Cryptocurrency",
+    "assetClass": "Crypto"
+  },
+  {
+    "ticker": "SOL-USD",
+    "name": "Solana",
+    "sector": "Cryptocurrency",
+    "assetClass": "Crypto"
+  },
+  {
+    "ticker": "XRP-USD",
+    "name": "Ripple",
+    "sector": "Cryptocurrency",
+    "assetClass": "Crypto"
+  },
+  {
+    "ticker": "DOT-USD",
+    "name": "Polkadot",
+    "sector": "Cryptocurrency",
+    "assetClass": "Crypto"
+  },
+  {
+    "ticker": "DOGE-USD",
+    "name": "Dogecoin",
+    "sector": "Cryptocurrency",
+    "assetClass": "Crypto"
+  },
+  {
+    "ticker": "MATIC-USD",
+    "name": "Polygon",
+    "sector": "Cryptocurrency",
+    "assetClass": "Crypto"
+  },
+  {
+    "ticker": "LINK-USD",
+    "name": "Chainlink",
+    "sector": "Cryptocurrency",
+    "assetClass": "Crypto"
+  },
+  {
+    "ticker": "ADP",
+    "name": "Automatic Data Processing, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "NOW",
+    "name": "ServiceNow, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "TXN",
+    "name": "Texas Instruments Incorporated",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "MDB",
+    "name": "MongoDB, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PANW",
+    "name": "Palo Alto Networks, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ANET",
+    "name": "Arista Networks, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ZS",
+    "name": "Zscaler, Inc.",
+    "sector": "Technology",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ROST",
+    "name": "Ross Stores, Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "EBAY",
+    "name": "eBay Inc.",
+    "sector": "Consumer Cyclical",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "KR",
+    "name": "The Kroger Co.",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "DG",
+    "name": "Dollar General Corporation",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SYY",
+    "name": "Sysco Corporation",
+    "sector": "Consumer Defensive",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "DHR",
+    "name": "Danaher Corporation",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "SYK",
+    "name": "Stryker Corporation",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ISRG",
+    "name": "Intuitive Surgical, Inc.",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "HUM",
+    "name": "Humana Inc.",
+    "sector": "Healthcare",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "ICE",
+    "name": "Intercontinental Exchange, Inc.",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "CME",
+    "name": "CME Group Inc.",
+    "sector": "Financial Services",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "HES",
+    "name": "Hess Corporation",
+    "sector": "Energy",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "LIN",
+    "name": "Linde plc",
+    "sector": "Basic Materials",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "AEP",
+    "name": "American Electric Power Company, Inc.",
+    "sector": "Utilities",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "XEL",
+    "name": "Xcel Energy Inc.",
+    "sector": "Utilities",
+    "assetClass": "Stock"
+  },
+  {
+    "ticker": "PEG",
+    "name": "Public Service Enterprise Group Incorporated",
+    "sector": "Utilities",
+    "assetClass": "Stock"
+  }
 ]

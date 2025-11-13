@@ -188,7 +188,7 @@ function App() {
             <main className="container mx-auto p-4 py-8 transition-colors duration-300">
                 {/* Portfolio Builder Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    <StockSelector />
+                    <StockSelector onAddAsset={handleStockDrop} />
                     <PortfolioBuilder
                         portfolio={portfolio}
                         onDrop={handleStockDrop}
