@@ -1,3 +1,25 @@
+"""
+main.py
+
+SmartRisk Lite Backend API
+
+FastAPI-based REST API for portfolio risk analysis and Monte Carlo projections.
+Provides endpoints for analyzing portfolio metrics, fetching asset data, and
+generating probabilistic return scenarios.
+
+Key Features:
+- Multi-source data fetching (Yahoo Finance, Alpha Vantage) with intelligent caching
+- Portfolio risk metrics (Sharpe ratio, volatility, expected returns)
+- Monte Carlo simulations for probabilistic projections
+- Graceful handling of partial data failures
+- Rate limit workarounds for free-tier APIs
+
+Endpoints:
+- GET /popular_stocks: Paginated list of curated stocks, ETFs, and crypto
+- POST /analyze_portfolio: Comprehensive portfolio analysis with projections
+- GET /search_assets: Live ticker lookup via yfinance
+"""
+
 import yfinance as yf
 import numpy as np
 import pandas as pd
@@ -12,26 +34,41 @@ import json
 from core.monte_carlo import run_monte_carlo_simulation, calculate_portfolio_historical_cagr
 from core.cache_manager import get_cache
 
-# Constants
-RISK_FREE_RATE = 0.04  # 4% annual risk-free rate
-SHARPE_THRESHOLD_LOW = 0.5
-SHARPE_THRESHOLD_HIGH = 1.0
-DAYS_IN_YEAR = 252
-LOOKBACK_DAYS = 365
+# Constants - Financial calculations
+RISK_FREE_RATE = 0.04  # 4% annual risk-free rate (US Treasury baseline)
+SHARPE_THRESHOLD_LOW = 0.5  # Below this is considered poor risk-adjusted return
+SHARPE_THRESHOLD_HIGH = 1.0  # Above this is considered good risk-adjusted return
+DAYS_IN_YEAR = 252  # Trading days in a typical year
+LOOKBACK_DAYS = 365  # Historical data window for analysis
+
+# Constants - File paths and configuration
 POPULAR_STOCKS_PATH = os.path.join(os.path.dirname(__file__), 'data', 'popular_stocks.json')
-ALLOWED_PATH_COUNTS = [5000, 10000, 20000]
+ALLOWED_PATH_COUNTS = [5000, 10000, 20000]  # Valid Monte Carlo simulation path counts
 
 
-# 1. Input Data Model
+# Pydantic Models
 class Portfolio(BaseModel):
+    """
+    Portfolio input model for analysis requests.
+
+    Attributes:
+        tickers: List of stock ticker symbols (e.g., ['AAPL', 'MSFT', 'GOOG'])
+        weights: List of portfolio weights (must sum to 1.0)
+        num_paths: Optional Monte Carlo path count (default: 5000)
+    """
     tickers: List[str]
     weights: List[float]
     num_paths: Optional[int] = None
 
-# 2. FastAPI App Initialization
-app = FastAPI()
 
-# 3. CORS Configuration
+# FastAPI App Initialization
+app = FastAPI(
+    title="SmartRisk Lite API",
+    description="Portfolio risk analysis and Monte Carlo projection engine",
+    version="0.1.0"
+)
+
+# CORS Configuration
 # Allow localhost for development, and production domains (Vercel, Railway, Render)
 app.add_middleware(
     CORSMiddleware,
@@ -41,7 +78,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Helper Functions
+
+# ========== Helper Functions ==========
 def fetch_prices_with_cache_and_hybrid(tickers, start_date, end_date, primary_source='yfinance', api_key=None):
     """
     Intelligent data fetching with caching and hybrid source strategy.
@@ -176,7 +214,7 @@ def fetch_prices_with_cache_and_hybrid(tickers, start_date, end_date, primary_so
     return prices_data, source_info
 
 
-def validate_portfolio_inputs(tickers: List[str], weights: List[float]):
+def validate_portfolio_inputs(tickers: List[str], weights: List[float]) -> None:
     """
     Validates portfolio input data.
     
@@ -203,7 +241,8 @@ def validate_portfolio_inputs(tickers: List[str], weights: List[float]):
         raise ValueError(f"The sum of weights must be 1.0 (currently {sum(weights):.4f}).")
 
 
-# 4. API Endpoints
+# ========== API Endpoints ==========
+
 @app.get("/popular_stocks")
 async def get_popular_stocks(
     asset_type: Optional[str] = Query(None, alias="asset_type"),
@@ -212,8 +251,26 @@ async def get_popular_stocks(
     limit: int = 60,
 ):
     """
-    Serves a list of popular stocks, ETFs, and crypto assets.
-    Optionally filters by asset_type ('Stock', 'ETF', 'Crypto').
+    Retrieve paginated list of curated stocks, ETFs, and crypto assets.
+
+    This endpoint serves a pre-curated list of 236 popular assets across
+    different asset classes and sectors. Supports filtering and pagination.
+
+    Query Parameters:
+        asset_type: Filter by asset class ('Stock', 'ETF', 'Crypto')
+        sector: Filter by sector (e.g., 'Technology', 'Healthcare')
+        page: Page number for pagination (default: 1)
+        limit: Items per page (default: 60, max: 200)
+
+    Returns:
+        dict: {
+            'items': List of asset objects with ticker, name, sector, assetClass
+            'total': Total count matching filters
+            'asset_classes': Available asset class options
+            'sectors': Available sector options
+            'page': Current page number
+            'limit': Items per page
+        }
     """
     try:
         with open(POPULAR_STOCKS_PATH, 'r') as f:
@@ -257,12 +314,47 @@ async def get_popular_stocks(
 
 
 @app.post("/analyze_portfolio")
-async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(None, alias="X-Data-Source"), x_alphavantage_key: str = Header(None, alias="X-AlphaVantage-Key")):
+async def analyze_portfolio(
+    portfolio: Portfolio,
+    x_data_source: str = Header(None, alias="X-Data-Source"),
+    x_alphavantage_key: str = Header(None, alias="X-AlphaVantage-Key")
+):
     """
-    Analyzes a portfolio of stocks.
-    - Fetches 1 year of daily price data.
-    - Calculates daily returns, expected annual return, volatility, and Sharpe ratio.
-    - Returns these metrics for each ticker and for the overall portfolio.
+    Perform comprehensive portfolio risk analysis with Monte Carlo projections.
+
+    This is the primary analysis endpoint that:
+    1. Fetches 1 year of historical price data (with intelligent caching)
+    2. Calculates risk/return metrics for each asset and the portfolio
+    3. Generates Monte Carlo simulations for probabilistic projections
+    4. Provides AI-generated natural language summary
+    5. Handles partial failures gracefully (adjusts weights if some tickers fail)
+
+    Request Body:
+        portfolio: {
+            'tickers': List of ticker symbols (e.g., ['AAPL', 'MSFT'])
+            'weights': List of weights summing to 1.0 (e.g., [0.6, 0.4])
+            'num_paths': Optional Monte Carlo path count (5000/10000/20000)
+        }
+
+    Headers (Optional):
+        X-Data-Source: 'yfinance' or 'alpha_vantage' (default: yfinance)
+        X-AlphaVantage-Key: API key if using Alpha Vantage
+
+    Returns:
+        dict: {
+            'individual_metrics': Per-ticker risk/return stats
+            'portfolio_metrics': Aggregated portfolio stats
+            'projections': Monte Carlo percentile projections (P10/P50/P90)
+            'summary': Natural language analysis
+            'data_sources': Cache/source info for each ticker
+            'warning': Optional message for partial failures
+            'tickers': Final ticker list (may differ if failures occurred)
+            'weights': Final weights (normalized if failures occurred)
+        }
+
+    Error Responses:
+        400: Invalid input (weights don't sum to 1.0, etc.)
+        500: Data fetch failures, calculation errors
     """
     # Validate inputs
     try:
@@ -446,11 +538,34 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
 
 @app.get("/search_assets")
 async def search_assets(query: str):
+    """
+    Search for an asset by ticker symbol using live yfinance data.
+
+    This endpoint enables users to add assets not in the curated list
+    by performing a live lookup against Yahoo Finance's database.
+
+    Query Parameters:
+        query: Ticker symbol to search (e.g., 'AAPL', 'BTC-USD')
+
+    Returns:
+        dict: {
+            'ticker': Normalized ticker symbol (uppercase)
+            'name': Full company/asset name
+            'sector': Sector or industry classification
+            'assetClass': Detected asset type (Stock/ETF/Crypto)
+            'source': Data provider ('yfinance')
+        }
+
+    Error Responses:
+        400: Query parameter missing or empty
+        404: Ticker not found or invalid
+    """
     ticker = query.strip().upper()
     if not ticker:
         raise HTTPException(status_code=400, detail="Query parameter is required.")
 
     try:
+        # Fetch ticker metadata from yfinance
         yf_ticker = yf.Ticker(ticker)
         info = yf_ticker.info or {}
     except Exception as exc:
@@ -459,10 +574,12 @@ async def search_assets(query: str):
     if not info:
         raise HTTPException(status_code=404, detail=f"No data found for {ticker}")
 
+    # Extract metadata with fallbacks
     name = info.get("shortName") or info.get("longName") or ticker
     sector = info.get("sector") or info.get("industry") or "Unknown"
     quote_type = (info.get("quoteType") or "").lower()
 
+    # Classify asset type based on quote type and ticker format
     if ticker.endswith("-USD") or quote_type in {"cryptocurrency", "crypto"}:
         asset_class = "Crypto"
     elif quote_type == "etf":
@@ -478,15 +595,32 @@ async def search_assets(query: str):
         "source": "yfinance"
     }
 
-def generate_summary(metrics, portfolio):
+
+def generate_summary(metrics: dict, portfolio) -> str:
     """
-    Generate a detailed portfolio analysis summary.
+    Generate a natural language portfolio analysis summary.
+
+    Synthesizes multiple dimensions of portfolio quality into a readable
+    narrative for end users, covering:
+    - Risk-adjusted performance (Sharpe ratio interpretation)
+    - Return classification (conservative to aggressive)
+    - Volatility assessment (low to high risk)
+    - Diversification quality
+    - Concentration warnings
+    - Actionable recommendations
+
+    Args:
+        metrics: Dictionary with 'sharpe_ratio', 'expected_annual_return', 'annual_volatility'
+        portfolio: Portfolio object with 'tickers' and 'weights' attributes
+
+    Returns:
+        str: Multi-sentence natural language summary
     """
     sharpe = metrics.get('sharpe_ratio', 0)
     expected_return = metrics.get('expected_annual_return', 0)
     volatility = metrics.get('annual_volatility', 0)
 
-    # Risk-adjusted performance assessment
+    # Risk-adjusted performance assessment (Sharpe ratio thresholds)
     if sharpe < 0:
         performance = "underperforming the risk-free rate"
         recommendation = "Consider reviewing your asset selection."
