@@ -27,6 +27,9 @@ class Portfolio(BaseModel):
     tickers: List[str]
     weights: List[float]
     num_paths: Optional[int] = None
+    initial_investment: Optional[float] = 10000.0
+    monthly_contribution: Optional[float] = 0.0
+    contribution_frequency: Optional[str] = "monthly"  # "monthly", "quarterly", "annually"
 
 # 2. FastAPI App Initialization
 app = FastAPI()
@@ -176,31 +179,45 @@ def fetch_prices_with_cache_and_hybrid(tickers, start_date, end_date, primary_so
     return prices_data, source_info
 
 
-def validate_portfolio_inputs(tickers: List[str], weights: List[float]):
+def validate_portfolio_inputs(tickers: List[str], weights: List[float], initial_investment: float = 10000.0,
+                            monthly_contribution: float = 0.0, contribution_frequency: str = "monthly"):
     """
     Validates portfolio input data.
-    
+
     Args:
         tickers: List of stock ticker symbols
         weights: List of portfolio weights
-        
+        initial_investment: Initial investment amount (must be positive)
+        monthly_contribution: Monthly contribution amount (must be non-negative)
+        contribution_frequency: Frequency of contributions ("monthly", "quarterly", "annually")
+
     Raises:
         ValueError: If inputs are invalid
     """
     if not tickers or len(tickers) == 0:
         raise ValueError("At least one ticker is required.")
-    
+
     if len(tickers) != len(weights):
         raise ValueError("The number of tickers and weights must be the same.")
-    
+
     if any(w < 0 for w in weights):
         raise ValueError("Weights cannot be negative.")
-    
+
     if any(w > 1 for w in weights):
         raise ValueError("Individual weights cannot exceed 1.0.")
-    
+
     if not np.isclose(sum(weights), 1.0, atol=0.01):
         raise ValueError(f"The sum of weights must be 1.0 (currently {sum(weights):.4f}).")
+
+    if initial_investment <= 0:
+        raise ValueError("Initial investment must be greater than 0.")
+
+    if monthly_contribution < 0:
+        raise ValueError("Monthly contribution cannot be negative.")
+
+    valid_frequencies = ["monthly", "quarterly", "annually"]
+    if contribution_frequency not in valid_frequencies:
+        raise ValueError(f"Contribution frequency must be one of {valid_frequencies}.")
 
 
 # 4. API Endpoints
@@ -266,7 +283,13 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
     """
     # Validate inputs
     try:
-        validate_portfolio_inputs(portfolio.tickers, portfolio.weights)
+        validate_portfolio_inputs(
+            portfolio.tickers,
+            portfolio.weights,
+            portfolio.initial_investment,
+            portfolio.monthly_contribution,
+            portfolio.contribution_frequency
+        )
     except ValueError as e:
         return {"error": str(e)}
 
@@ -413,7 +436,9 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
         daily_returns=returns,
         weights=adjusted_weights,
         num_years=10,
-        initial_value=10000,
+        initial_value=portfolio.initial_investment,
+        periodic_contribution=portfolio.monthly_contribution,
+        contribution_frequency=portfolio.contribution_frequency,
         num_paths=simulation_paths
     )
 
@@ -435,7 +460,12 @@ async def analyze_portfolio(portfolio: Portfolio, x_data_source: str = Header(No
         "weights": adjusted_weights,  # Use adjusted weights
         "tickers": adjusted_tickers,   # Use adjusted tickers
         "summary": summary,
-        "data_sources": source_info  # Add data source information
+        "data_sources": source_info,  # Add data source information
+        "contribution_settings": {
+            "initial_investment": portfolio.initial_investment,
+            "periodic_contribution": portfolio.monthly_contribution,
+            "contribution_frequency": portfolio.contribution_frequency
+        }
     }
 
     # Add warning if there were missing tickers

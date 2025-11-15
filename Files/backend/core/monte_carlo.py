@@ -15,10 +15,12 @@ def run_monte_carlo_simulation(
     num_years=10,
     num_paths=None,
     initial_value=10000,
+    periodic_contribution=0.0,
+    contribution_frequency="monthly",
     rng=None,
 ):
     """
-    Run Monte Carlo simulation for portfolio projections.
+    Run Monte Carlo simulation for portfolio projections with periodic contributions.
 
     Args:
         daily_returns (pd.DataFrame): DataFrame of daily returns for each asset (rows=dates, cols=tickers)
@@ -26,11 +28,19 @@ def run_monte_carlo_simulation(
         num_years (int): Number of years to project forward (default: 10)
         num_paths (int): Number of Monte Carlo paths to simulate (default: from env or 5000)
         initial_value (float): Starting portfolio value for projections (default: 10000)
+        periodic_contribution (float): Amount to contribute periodically (default: 0.0)
+        contribution_frequency (str): "monthly", "quarterly", or "annually" (default: "monthly")
 
     Returns:
         dict: {
             'years': [1, 2, ..., num_years],
             'percentiles': {
+                'p10': [...],
+                'p50': [...],
+                'p90': [...],
+                'mean': [...]
+            },
+            'percentiles_pct': {  # Percentage returns from initial investment only
                 'p10': [...],
                 'p50': [...],
                 'p90': [...],
@@ -45,6 +55,14 @@ def run_monte_carlo_simulation(
     # Constants
     DAYS_IN_YEAR = 252
     total_days = DAYS_IN_YEAR * num_years
+
+    # Calculate contribution interval in trading days
+    contribution_intervals = {
+        "monthly": 21,    # ~21 trading days per month
+        "quarterly": 63,   # ~63 trading days per quarter
+        "annually": 252    # 252 trading days per year
+    }
+    contribution_interval = contribution_intervals.get(contribution_frequency, 21)
 
     # Calculate historical statistics
     mean_returns = daily_returns.mean().values  # Mean daily return for each asset
@@ -82,6 +100,10 @@ def run_monte_carlo_simulation(
         current_values = np.full(paths_in_chunk, initial_value, dtype=np.float64)
 
         for day in range(1, total_days + 1):
+            # Add periodic contribution at the start of each period
+            if periodic_contribution > 0 and day % contribution_interval == 0:
+                current_values += periodic_contribution
+
             if asset_count == 1:
                 daily_returns = rng.normal(
                     loc=mean_return_single,

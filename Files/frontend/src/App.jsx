@@ -43,6 +43,9 @@ function App() {
     const [dataSource, setDataSource] = useState('yfinance');
     const [apiKey, setApiKey] = useState('');
     const [simulationPaths, setSimulationPaths] = useState(SIMULATION_OPTIONS[0].value);
+    const [initialInvestment, setInitialInvestment] = useState(10000);
+    const [monthlyContribution, setMonthlyContribution] = useState(0);
+    const [contributionFrequency, setContributionFrequency] = useState('monthly');
     const [theme, setTheme] = useState(() => {
         if (typeof window !== 'undefined') {
             const storedTheme = window.localStorage.getItem('sr-theme');
@@ -88,6 +91,9 @@ function App() {
                 tickers,
                 weights,
                 num_paths: simulationPaths,
+                initial_investment: initialInvestment,
+                monthly_contribution: monthlyContribution,
+                contribution_frequency: contributionFrequency,
             }, {
                 headers,
                 timeout: 60000 // 60 second timeout
@@ -196,6 +202,56 @@ function App() {
                         onWeightChange={handleWeightChange}
                         onRemoveStock={handleRemoveStock}
                     />
+                </div>
+
+                {/* Investment Settings */}
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-slate-800 max-w-2xl mx-auto mb-6 transition-colors">
+                    <h3 className="text-md font-medium text-gray-900 dark:text-slate-100 mb-4">Investment Settings</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label htmlFor="initialInvestment" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">
+                                Initial Investment ($)
+                            </label>
+                            <input
+                                type="number"
+                                id="initialInvestment"
+                                min="1"
+                                step="1000"
+                                value={initialInvestment}
+                                onChange={(e) => setInitialInvestment(parseFloat(e.target.value) || 10000)}
+                                className="block w-full px-3 py-2 border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="monthlyContribution" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">
+                                Contribution Amount ($)
+                            </label>
+                            <input
+                                type="number"
+                                id="monthlyContribution"
+                                min="0"
+                                step="100"
+                                value={monthlyContribution}
+                                onChange={(e) => setMonthlyContribution(parseFloat(e.target.value) || 0)}
+                                className="block w-full px-3 py-2 border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="contributionFrequency" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">
+                                Frequency
+                            </label>
+                            <select
+                                id="contributionFrequency"
+                                value={contributionFrequency}
+                                onChange={(e) => setContributionFrequency(e.target.value)}
+                                className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border transition-colors"
+                            >
+                                <option value="monthly">Monthly</option>
+                                <option value="quarterly">Quarterly</option>
+                                <option value="annually">Annually</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Data Source Settings */}
@@ -367,8 +423,14 @@ function App() {
 
                                 {/* New Projection Components */}
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                    <ProjectionSlider projections={portfolioData.projections} />
-                                    <AdvancedProjections projections={portfolioData.projections} />
+                                    <ProjectionSlider
+                                        projections={portfolioData.projections}
+                                        contributionSettings={portfolioData.contribution_settings}
+                                    />
+                                    <AdvancedProjections
+                                        projections={portfolioData.projections}
+                                        contributionSettings={portfolioData.contribution_settings}
+                                    />
                                 </div>
                             </>
                         )}

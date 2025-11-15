@@ -24,12 +24,16 @@ ChartJS.register(
   Filler
 );
 
-function AdvancedProjections({ projections, initialInvestment = 10000 }) {
+function AdvancedProjections({ projections, contributionSettings }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!projections || !projections.percentiles) {
     return null;
   }
+
+  const initialInvestment = contributionSettings?.initial_investment || 10000;
+  const periodicContribution = contributionSettings?.periodic_contribution || 0;
+  const frequency = contributionSettings?.contribution_frequency || 'monthly';
 
   const { years, percentiles } = projections;
   const { p10, p50, p90, mean } = percentiles;
@@ -121,7 +125,14 @@ function AdvancedProjections({ projections, initialInvestment = 10000 }) {
           label: function(context) {
             const label = context.dataset.label || '';
             const value = context.parsed.y;
-            const returnPct = ((value - initialInvestment) / initialInvestment * 100).toFixed(1);
+            const year = context.dataIndex + 1;
+
+            // Calculate total invested by this year
+            const contributionsPerYear = frequency === 'monthly' ? 12 : frequency === 'quarterly' ? 4 : 1;
+            const totalContributions = periodicContribution * contributionsPerYear * year;
+            const totalInvested = initialInvestment + totalContributions;
+
+            const returnPct = ((value - totalInvested) / totalInvested * 100).toFixed(1);
             return `${label}: $${value.toLocaleString()} (${returnPct >= 0 ? '+' : ''}${returnPct}%)`;
           }
         }
