@@ -23,6 +23,7 @@ Endpoints:
 import yfinance as yf
 import numpy as np
 import pandas as pd
+import re
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -44,6 +45,11 @@ LOOKBACK_DAYS = 365  # Historical data window for analysis
 # Constants - File paths and configuration
 POPULAR_STOCKS_PATH = os.path.join(os.path.dirname(__file__), 'data', 'popular_stocks.json')
 ALLOWED_PATH_COUNTS = [5000, 10000, 20000]  # Valid Monte Carlo simulation path counts
+
+# Constants - Security
+MAX_PORTFOLIO_SIZE = 50  # Maximum number of assets in a portfolio
+MIN_WEIGHT_PRECISION = 0.0001  # Minimum weight precision (0.01%)
+TICKER_PATTERN = re.compile(r'^[A-Z0-9.\-]{1,10}$')  # Valid ticker format
 
 
 # Pydantic Models
@@ -68,15 +74,62 @@ app = FastAPI(
     version="0.1.0"
 )
 
-# CORS Configuration
-# Allow localhost for development, and production domains (Vercel, Railway, Render)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origin_regex=r"(http://localhost:\d+|https://.*\.vercel\.app|https://.*\.railway\.app|https://.*\.onrender\.com)",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# CORS Configuration - Explicit Whitelist for Security
+# Environment-aware: permissive in development, restrictive in production
+ENV = os.getenv("ENV", "development")
+
+if ENV == "production":
+    # Production: Explicit whitelist of allowed origins
+    ALLOWED_ORIGINS = [
+        "https://smartrisk-lite.vercel.app",  # Production frontend
+        "https://smartrisk-lite-*.vercel.app",  # Vercel preview deployments
+        os.getenv("FRONTEND_URL")  # Additional origin from environment
+    ]
+    # Filter out None values
+    ALLOWED_ORIGINS = [origin for origin in ALLOWED_ORIGINS if origin]
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=ALLOWED_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["GET", "POST"],  # Only needed methods
+        allow_headers=["Content-Type", "X-Data-Source", "X-AlphaVantage-Key"],
+    )
+else:
+    # Development: Allow localhost on any port
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=r"http://localhost:\d+",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+# Security Headers Middleware
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    """
+    Add security headers to all responses.
+
+    Headers:
+    - Strict-Transport-Security: Enforce HTTPS for 1 year
+    - X-Content-Type-Options: Prevent MIME sniffing
+    - X-Frame-Options: Prevent clickjacking
+    - X-XSS-Protection: Enable browser XSS filter
+    - Content-Security-Policy: Restrict resource loading
+    """
+    response = await call_next(request)
+
+    # Only add HSTS in production (requires HTTPS)
+    if ENV == "production":
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Content-Security-Policy"] = "default-src 'self'"
+
+    return response
 
 
 # ========== Helper Functions ==========
@@ -216,29 +269,72 @@ def fetch_prices_with_cache_and_hybrid(tickers, start_date, end_date, primary_so
 
 def validate_portfolio_inputs(tickers: List[str], weights: List[float]) -> None:
     """
-    Validates portfolio input data.
-    
+    Validates portfolio input data with comprehensive security checks.
+
+    Performs validation to prevent:
+    - Denial of service (excessive portfolio sizes)
+    - Invalid ticker formats (injection attempts)
+    - Malformed weight data
+    - Duplicate tickers
+    - Precision abuse
+
     Args:
-        tickers: List of stock ticker symbols
-        weights: List of portfolio weights
-        
+        tickers: List of stock ticker symbols (1-10 chars, alphanumeric + . -)
+        weights: List of portfolio weights (must sum to 1.0)
+
     Raises:
-        ValueError: If inputs are invalid
+        ValueError: If any validation check fails
     """
+    # Portfolio size limits (prevent resource exhaustion)
     if not tickers or len(tickers) == 0:
         raise ValueError("At least one ticker is required.")
-    
+
+    if len(tickers) > MAX_PORTFOLIO_SIZE:
+        raise ValueError(f"Portfolio too large. Maximum {MAX_PORTFOLIO_SIZE} assets allowed.")
+
     if len(tickers) != len(weights):
-        raise ValueError("The number of tickers and weights must be the same.")
-    
-    if any(w < 0 for w in weights):
-        raise ValueError("Weights cannot be negative.")
-    
-    if any(w > 1 for w in weights):
-        raise ValueError("Individual weights cannot exceed 1.0.")
-    
-    if not np.isclose(sum(weights), 1.0, atol=0.01):
-        raise ValueError(f"The sum of weights must be 1.0 (currently {sum(weights):.4f}).")
+        raise ValueError(f"Ticker/weight mismatch: {len(tickers)} tickers, {len(weights)} weights.")
+
+    # Validate individual tickers and weights
+    for i, (ticker, weight) in enumerate(zip(tickers, weights)):
+        # Ticker format validation (security: prevent injection)
+        if not isinstance(ticker, str):
+            raise ValueError(f"Ticker at position {i+1} must be a string.")
+
+        if not TICKER_PATTERN.match(ticker):
+            raise ValueError(
+                f"Invalid ticker format: '{ticker}'. "
+                "Use 1-10 uppercase letters, numbers, dots, or hyphens only."
+            )
+
+        # Weight type validation
+        if not isinstance(weight, (int, float)):
+            raise ValueError(f"Weight for {ticker} must be a number, got {type(weight).__name__}.")
+
+        # Weight range validation
+        if weight < 0:
+            raise ValueError(f"Weight for {ticker} cannot be negative ({weight}).")
+
+        if weight > 1.0:
+            raise ValueError(f"Weight for {ticker} cannot exceed 1.0 ({weight}).")
+
+        # Precision validation (prevent precision abuse)
+        if weight > 0 and weight < MIN_WEIGHT_PRECISION:
+            raise ValueError(
+                f"Weight for {ticker} too small ({weight}). "
+                f"Minimum precision is {MIN_WEIGHT_PRECISION*100}%."
+            )
+
+    # Sum validation
+    weight_sum = sum(weights)
+    if not np.isclose(weight_sum, 1.0, atol=0.01):
+        raise ValueError(f"Weights must sum to 1.0 (currently {weight_sum:.4f}).")
+
+    # Duplicate detection (security: prevent confusion attacks)
+    unique_tickers = set(tickers)
+    if len(unique_tickers) != len(tickers):
+        duplicates = [t for t in unique_tickers if tickers.count(t) > 1]
+        raise ValueError(f"Duplicate tickers not allowed: {', '.join(duplicates)}")
 
 
 # ========== API Endpoints ==========
@@ -560,16 +656,30 @@ async def search_assets(query: str):
         400: Query parameter missing or empty
         404: Ticker not found or invalid
     """
+    # Sanitize and validate ticker format (SECURITY: prevent injection/path traversal)
     ticker = query.strip().upper()
+
     if not ticker:
         raise HTTPException(status_code=400, detail="Query parameter is required.")
+
+    # Validate ticker format before passing to yfinance
+    if not TICKER_PATTERN.match(ticker):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid ticker format. Use 1-10 uppercase letters, numbers, dots, or hyphens."
+        )
+
+    if len(ticker) > 10:
+        raise HTTPException(status_code=400, detail="Ticker too long (maximum 10 characters).")
 
     try:
         # Fetch ticker metadata from yfinance
         yf_ticker = yf.Ticker(ticker)
         info = yf_ticker.info or {}
     except Exception as exc:
-        raise HTTPException(status_code=404, detail=f"Unable to fetch data for {ticker}: {exc}")
+        # Log exception but don't expose internal details to user
+        print(f"yfinance error for ticker '{ticker}': {exc}")
+        raise HTTPException(status_code=404, detail=f"Ticker '{ticker}' not found.")
 
     if not info:
         raise HTTPException(status_code=404, detail=f"No data found for {ticker}")

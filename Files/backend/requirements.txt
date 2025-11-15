@@ -1,10 +1,31 @@
-fastapi
-uvicorn
-yfinance
-numpy
-pandas>=1.5.0
-python-multipart
-pydantic
-python-dotenv
-requests
-pytest
+# SmartRisk Lite Backend Dependencies
+# All versions pinned for security and reproducibility
+# Last updated: 2025-11-15
+
+# Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Financial Data
+yfinance==0.2.32
+
+# Data Processing
+numpy==1.24.4
+pandas==2.1.4
+
+# HTTP & API
+python-multipart==0.0.6
+requests==2.31.0
+
+# Data Validation
+pydantic==2.5.2
+
+# Configuration
+python-dotenv==1.0.0
+
+# Testing
+pytest==7.4.3
+
+# Security (Optional - Recommended for Production)
+# Uncomment to enable rate limiting:
+# slowapi==0.1.9
