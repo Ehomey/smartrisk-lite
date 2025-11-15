@@ -82,18 +82,10 @@ app = FastAPI(
 ENV = os.getenv("ENV", "development")
 
 if ENV == "production":
-    # Production: Explicit whitelist of allowed origins
-    ALLOWED_ORIGINS = [
-        "https://smartrisk-lite.vercel.app",  # Production frontend
-        "https://smartrisk-lite-*.vercel.app",  # Vercel preview deployments
-        os.getenv("FRONTEND_URL")  # Additional origin from environment
-    ]
-    # Filter out None values
-    ALLOWED_ORIGINS = [origin for origin in ALLOWED_ORIGINS if origin]
-
+    # Production: Use regex pattern to allow Vercel deployments (main + preview branches)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=ALLOWED_ORIGINS,
+        allow_origin_regex=r"https://smartrisk-lite.*\.vercel\.app",
         allow_credentials=True,
         allow_methods=["GET", "POST"],  # Only needed methods
         allow_headers=["Content-Type", "X-Data-Source", "X-AlphaVantage-Key"],
