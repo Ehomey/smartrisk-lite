@@ -41,20 +41,29 @@ ChartJS.register(
 /**
  * AdvancedProjections Component
  *
+ * Displays Monte Carlo simulation results with contribution-aware projections.
+ *
  * @param {Object} props - Component props
  * @param {Object} props.projections - Projection data from backend
  * @param {number[]} props.projections.years - Array of year values (1-10)
  * @param {Object} props.projections.percentiles - Percentile arrays (p10, p50, p90, mean)
  * @param {number} props.projections.cagr - Historical compound annual growth rate
- * @param {number} [props.initialInvestment=10000] - Starting portfolio value for tooltip calculations
+ * @param {Object} props.contributionSettings - Contribution configuration
+ * @param {number} props.contributionSettings.initial_investment - Starting portfolio value
+ * @param {number} props.contributionSettings.periodic_contribution - Amount added periodically
+ * @param {string} props.contributionSettings.contribution_frequency - Frequency (monthly/quarterly/annually)
  * @returns {JSX.Element} Collapsible chart component
  */
-function AdvancedProjections({ projections, initialInvestment = 10000 }) {
+function AdvancedProjections({ projections, contributionSettings }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!projections || !projections.percentiles) {
     return null;
   }
+
+  const initialInvestment = contributionSettings?.initial_investment || 10000;
+  const periodicContribution = contributionSettings?.periodic_contribution || 0;
+  const frequency = contributionSettings?.contribution_frequency || 'monthly';
 
   const { years, percentiles } = projections;
   const { p10, p50, p90, mean } = percentiles;
@@ -146,7 +155,14 @@ function AdvancedProjections({ projections, initialInvestment = 10000 }) {
           label: function(context) {
             const label = context.dataset.label || '';
             const value = context.parsed.y;
-            const returnPct = ((value - initialInvestment) / initialInvestment * 100).toFixed(1);
+            const year = context.dataIndex + 1;
+
+            // Calculate total invested by this year
+            const contributionsPerYear = frequency === 'monthly' ? 12 : frequency === 'quarterly' ? 4 : 1;
+            const totalContributions = periodicContribution * contributionsPerYear * year;
+            const totalInvested = initialInvestment + totalContributions;
+
+            const returnPct = ((value - totalInvested) / totalInvested * 100).toFixed(1);
             return `${label}: $${value.toLocaleString()} (${returnPct >= 0 ? '+' : ''}${returnPct}%)`;
           }
         }

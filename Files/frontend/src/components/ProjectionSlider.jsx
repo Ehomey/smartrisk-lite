@@ -17,12 +17,17 @@ import React, { useState } from 'react';
 /**
  * ProjectionSlider Component
  *
+ * Interactive slider for exploring contribution-aware portfolio projections.
+ *
  * @param {Object} props - Component props
  * @param {Object} props.projections - Projection data with percentile arrays
- * @param {number} [props.initialInvestment=10000] - Starting portfolio value
+ * @param {Object} props.contributionSettings - Contribution configuration
+ * @param {number} props.contributionSettings.initial_investment - Starting portfolio value
+ * @param {number} props.contributionSettings.periodic_contribution - Amount added periodically
+ * @param {string} props.contributionSettings.contribution_frequency - Frequency (monthly/quarterly/annually)
  * @returns {JSX.Element} Interactive projection slider
  */
-function ProjectionSlider({ projections, initialInvestment = 10000 }) {
+function ProjectionSlider({ projections, contributionSettings }) {
   const [selectedYear, setSelectedYear] = useState(5);
 
   if (!projections || !projections.percentiles) {
@@ -36,16 +41,25 @@ function ProjectionSlider({ projections, initialInvestment = 10000 }) {
     );
   }
 
+  const initialInvestment = contributionSettings?.initial_investment || 10000;
+  const periodicContribution = contributionSettings?.periodic_contribution || 0;
+  const frequency = contributionSettings?.contribution_frequency || 'monthly';
+
   // Get the index for the selected year (years are 1-indexed, array is 0-indexed)
   const yearIndex = selectedYear - 1;
   const p10Value = projections.percentiles.p10[yearIndex];
   const p50Value = projections.percentiles.p50[yearIndex];
   const p90Value = projections.percentiles.p90[yearIndex];
 
-  // Calculate returns as percentages
-  const p10Return = ((p10Value - initialInvestment) / initialInvestment) * 100;
-  const p50Return = ((p50Value - initialInvestment) / initialInvestment) * 100;
-  const p90Return = ((p90Value - initialInvestment) / initialInvestment) * 100;
+  // Calculate total contributions made by this year
+  const contributionsPerYear = frequency === 'monthly' ? 12 : frequency === 'quarterly' ? 4 : 1;
+  const totalContributions = periodicContribution * contributionsPerYear * selectedYear;
+  const totalInvested = initialInvestment + totalContributions;
+
+  // Calculate returns as percentages (based on total invested)
+  const p10Return = ((p10Value - totalInvested) / totalInvested) * 100;
+  const p50Return = ((p50Value - totalInvested) / totalInvested) * 100;
+  const p90Return = ((p90Value - totalInvested) / totalInvested) * 100;
 
   // Determine text color based on selected year
   const returnColorClass = selectedYear > 5 ? 'text-red-600 dark:text-red-300' : 'text-green-600 dark:text-green-300';
@@ -82,27 +96,41 @@ function ProjectionSlider({ projections, initialInvestment = 10000 }) {
       {/* Projected Return Display */}
       <div className="mb-4 p-4 bg-gray-50 dark:bg-slate-800/70 rounded-lg border border-gray-200 dark:border-slate-800">
         <div className="text-center">
-          <p className="text-sm text-gray-600 dark:text-slate-300 mb-1">Projected Median Return</p>
+          <p className="text-sm text-gray-600 dark:text-slate-300 mb-1">Projected Median Value</p>
           <p className={`text-3xl font-bold ${returnColorClass}`}>
-            {p50Return >= 0 ? '+' : ''}{p50Return.toFixed(1)}%
+            ${p50Value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </p>
-          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">over {selectedYear} year{selectedYear > 1 ? 's' : ''}</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+            {p50Return >= 0 ? '+' : ''}{p50Return.toFixed(1)}% return over {selectedYear} year{selectedYear > 1 ? 's' : ''}
+          </p>
         </div>
+
+        {/* Investment Summary */}
+        {periodicContribution > 0 && (
+          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-700 text-center">
+            <p className="text-xs text-gray-600 dark:text-slate-400">
+              Initial: ${initialInvestment.toLocaleString()} + Contributions: ${totalContributions.toLocaleString()} = Total Invested: ${totalInvested.toLocaleString()}
+            </p>
+          </div>
+        )}
 
         {/* Percentile Range */}
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-700">
           <div className="grid grid-cols-3 gap-2 text-center text-xs">
             <div>
               <p className="text-gray-500 dark:text-slate-400 mb-1">Pessimistic (P10)</p>
-              <p className="font-semibold text-gray-700 dark:text-slate-100">{p10Return >= 0 ? '+' : ''}{p10Return.toFixed(1)}%</p>
+              <p className="font-semibold text-gray-700 dark:text-slate-100">${p10Value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400">({p10Return >= 0 ? '+' : ''}{p10Return.toFixed(1)}%)</p>
             </div>
             <div>
               <p className="text-gray-500 dark:text-slate-400 mb-1">Median (P50)</p>
-              <p className="font-semibold text-gray-700 dark:text-slate-100">{p50Return >= 0 ? '+' : ''}{p50Return.toFixed(1)}%</p>
+              <p className="font-semibold text-gray-700 dark:text-slate-100">${p50Value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400">({p50Return >= 0 ? '+' : ''}{p50Return.toFixed(1)}%)</p>
             </div>
             <div>
               <p className="text-gray-500 dark:text-slate-400 mb-1">Optimistic (P90)</p>
-              <p className="font-semibold text-gray-700 dark:text-slate-100">{p90Return >= 0 ? '+' : ''}{p90Return.toFixed(1)}%</p>
+              <p className="font-semibold text-gray-700 dark:text-slate-100">${p90Value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400">({p90Return >= 0 ? '+' : ''}{p90Return.toFixed(1)}%)</p>
             </div>
           </div>
         </div>
