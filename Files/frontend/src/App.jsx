@@ -48,16 +48,19 @@ const SIMULATION_OPTIONS = [
 const resolveApiBase = () => {
     const envUrl = import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim();
     if (envUrl) {
+        console.log('[SmartRisk] Using API URL from VITE_API_URL:', envUrl);
         return envUrl;
     }
 
     if (typeof window !== 'undefined') {
         const host = window.location.hostname;
         if (host === 'localhost' || host === '127.0.0.1') {
+            console.log('[SmartRisk] Using local proxy:', '/api');
             return '/api';
         }
     }
 
+    console.log('[SmartRisk] Using fallback API URL:', REMOTE_API_FALLBACK);
     return REMOTE_API_FALLBACK;
 };
 
