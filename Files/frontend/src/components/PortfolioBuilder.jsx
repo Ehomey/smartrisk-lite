@@ -1,12 +1,43 @@
+/**
+ * PortfolioBuilder.jsx
+ *
+ * Interactive portfolio construction interface with drag-and-drop support,
+ * manual weight editing, and real-time validation.
+ *
+ * Key Features:
+ * - Drop zone for adding assets from StockSelector
+ * - Manual weight editing with percentage display
+ * - Automatic weight normalization when adding/removing assets
+ * - Real-time validation ensuring weights sum to 100%
+ * - Visual pie chart showing current allocation
+ * - Individual asset removal
+ */
+
 import React from 'react';
 import { Pie } from 'react-chartjs-2';
 
+/**
+ * PortfolioBuilder Component
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.portfolio - Portfolio object with tickers and weights arrays
+ * @param {Function} props.onDrop - Callback when asset is dropped
+ * @param {Function} props.onWeightChange - Callback when weight is manually changed
+ * @param {Function} props.onRemoveStock - Callback when asset is removed
+ * @returns {JSX.Element} Portfolio builder interface
+ */
 function PortfolioBuilder({ portfolio, onDrop, onWeightChange, onRemoveStock }) {
+  /**
+   * Allows drop operation by preventing default behavior.
+   */
   const handleDragOver = (e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'copy';
   };
 
+  /**
+   * Handles asset drop, extracting stock data and calling parent callback.
+   */
   const handleDrop = (e) => {
     e.preventDefault();
     const stockData = e.dataTransfer.getData('stock');
@@ -16,6 +47,13 @@ function PortfolioBuilder({ portfolio, onDrop, onWeightChange, onRemoveStock }) 
     }
   };
 
+  /**
+   * Converts percentage input to decimal weight and updates portfolio.
+   * Validates input is within 0-100% range.
+   *
+   * @param {number} index - Index of the asset to update
+   * @param {string} value - New weight as percentage string
+   */
   const handleWeightInputChange = (index, value) => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue) && numValue >= 0 && numValue <= 100) {
@@ -23,12 +61,19 @@ function PortfolioBuilder({ portfolio, onDrop, onWeightChange, onRemoveStock }) 
     }
   };
 
-  // Calculate total weight for validation
+  // Calculate total portfolio weight (should sum to 1.0 or 100%)
   const totalWeight = portfolio.weights.reduce((sum, w) => sum + w, 0);
   const totalWeightPercent = totalWeight * 100;
+  // Allow small floating-point tolerance (1% margin)
   const isValidWeight = Math.abs(totalWeight - 1.0) < 0.01;
 
-  // Generate colors for pie chart
+  /**
+   * Generates a color palette for the pie chart.
+   * Cycles through predefined colors if more assets than colors exist.
+   *
+   * @param {number} count - Number of colors needed
+   * @returns {string[]} Array of hex color codes
+   */
   const generateColors = (count) => {
     const colors = [
       '#3B82F6',

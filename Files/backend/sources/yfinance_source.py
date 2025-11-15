@@ -1,5 +1,27 @@
+"""
+yfinance_source.py
+
+Yahoo Finance Data Source Module
+
+Fetches historical stock price data using the yfinance library.
+This is the default data source as it's free, requires no API key,
+and has no rate limits.
+
+Key Features:
+- Free access (no API key required)
+- No rate limits
+- Comprehensive coverage (stocks, ETFs, crypto)
+- Automatically handles ticker format variations (e.g., . vs -)
+
+Limitations:
+- Data quality can vary for less-liquid securities
+- May occasionally have gaps or missing data
+- No SLA or guarantees
+"""
+
 import yfinance as yf
 import pandas as pd
+
 
 def fetch_prices(tickers: list[str], start: str, end: str) -> dict:
     """
@@ -18,12 +40,15 @@ def fetch_prices(tickers: list[str], start: str, end: str) -> dict:
         print(f"Fetching data for {len(tickers)} ticker(s) from Yahoo Finance...")
 
         # Yahoo Finance uses hyphens instead of periods in ticker symbols
-        # Map original tickers to Yahoo format
+        # (e.g., 'BRK.B' becomes 'BRK-B'). Create bidirectional mapping
+        # to preserve original ticker format in response.
         ticker_map = {ticker: ticker.replace('.', '-') for ticker in tickers}
         yahoo_tickers = list(ticker_map.values())
 
-        # Download data with progress=False to reduce console noise
-        # Set auto_adjust=False to get the 'Adj Close' column (yfinance changed default to True)
+        # Download historical data
+        # - progress=False: Suppress yfinance download bar for cleaner logs
+        # - auto_adjust=False: Get 'Adj Close' column explicitly (yfinance v0.2.0+ changed defaults)
+        # - ['Adj Close']: Use adjusted close prices (accounts for splits and dividends)
         data = yf.download(yahoo_tickers, start=start, end=end, progress=False, auto_adjust=False)['Adj Close']
         
         if data.empty:
@@ -32,14 +57,20 @@ def fetch_prices(tickers: list[str], start: str, end: str) -> dict:
 
         prices = {}
 
-        # yfinance now always returns a DataFrame (even for single tickers)
+        # Process yfinance response
+        # Modern yfinance (v0.2.0+) always returns DataFrame, even for single tickers
+        # Older versions returned Series for single tickers - we handle both cases
         if isinstance(data, pd.DataFrame):
+            # Multiple tickers: DataFrame with one column per ticker
             for original_ticker in tickers:
                 yahoo_ticker = ticker_map[original_ticker]
+
+                # Check if ticker column exists in response
                 if yahoo_ticker in data.columns:
-                    ticker_data = data[yahoo_ticker].dropna()
+                    ticker_data = data[yahoo_ticker].dropna()  # Remove NaN values
+
                     if len(ticker_data) > 0:
-                        # Use original ticker in the response
+                        # Convert to standardized format using original ticker symbol
                         prices[original_ticker] = [
                             {"date": index.strftime('%Y-%m-%d'), "close": float(value)}
                             for index, value in ticker_data.items()
@@ -50,9 +81,11 @@ def fetch_prices(tickers: list[str], start: str, end: str) -> dict:
                 else:
                     print(f"Ticker {original_ticker} not found in response")
         else:
-            # Fallback for Series (legacy behavior, unlikely with new yfinance)
+            # Single ticker fallback: Series format (legacy yfinance behavior)
+            # Unlikely with modern yfinance but kept for backward compatibility
             original_ticker = tickers[0]
             ticker_data = data.dropna()
+
             if len(ticker_data) > 0:
                 prices[original_ticker] = [
                     {"date": index.strftime('%Y-%m-%d'), "close": float(value)}

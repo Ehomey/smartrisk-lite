@@ -1,3 +1,21 @@
+/**
+ * MetricsTable.jsx
+ *
+ * Tabular display of risk and return metrics for individual assets
+ * and the overall portfolio.
+ *
+ * Shows:
+ * - Expected annual return (percentage)
+ * - Annual volatility (standard deviation)
+ * - Sharpe ratio (risk-adjusted return)
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.data - Analysis data from backend
+ * @param {Object} props.data.individual_metrics - Per-ticker metrics
+ * @param {Object} props.data.portfolio_metrics - Aggregated portfolio metrics
+ * @returns {JSX.Element} Metrics table
+ */
+
 import React from 'react';
 
 const MetricsTable = ({ data }) => {
