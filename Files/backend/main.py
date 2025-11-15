@@ -85,7 +85,7 @@ if ENV == "production":
     # Production: Use regex pattern to allow Vercel deployments (main + preview branches)
     app.add_middleware(
         CORSMiddleware,
-        allow_origin_regex=r"https://smartrisk-lite.*\.vercel\.app",
+        allow_origin_regex=r"^https://smartrisk-lite(-[a-z0-9]+)?\.vercel\.app$",
         allow_credentials=True,
         allow_methods=["GET", "POST"],  # Only needed methods
         allow_headers=["Content-Type", "X-Data-Source", "X-AlphaVantage-Key"],
