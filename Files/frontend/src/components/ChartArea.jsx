@@ -1,7 +1,23 @@
+/**
+ * ChartArea.jsx
+ *
+ * Legacy component for displaying portfolio allocation as a pie chart.
+ *
+ * NOTE: This component is not actively used in the current UI.
+ * Portfolio visualization is now handled directly in PortfolioBuilder.jsx.
+ * Retained for backward compatibility.
+ *
+ * @param {Object} props - Component props
+ * @param {string[]} props.tickers - Array of ticker symbols
+ * @param {number[]} props.weights - Array of portfolio weights (0.0 to 1.0)
+ * @returns {JSX.Element} Pie chart visualization
+ */
+
 import React from 'react';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
+// Register Chart.js components required for pie charts
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ChartArea = ({ tickers, weights }) => {

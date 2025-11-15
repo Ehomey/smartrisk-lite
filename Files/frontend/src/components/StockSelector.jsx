@@ -1,27 +1,66 @@
+/**
+ * StockSelector.jsx
+ *
+ * Asset selection component with search, filtering, and pagination capabilities.
+ * Displays a curated list of stocks, ETFs, and crypto assets that users can
+ * drag-and-drop or click to add to their portfolio.
+ *
+ * Key Features:
+ * - Paginated asset list with 60 items per page
+ * - Dual filtering by asset class (Stock/ETF/Crypto) and sector
+ * - Live search within loaded assets
+ * - Remote market search via yfinance API for unlisted tickers
+ * - Drag-and-drop support for portfolio building
+ * - Click-to-add quick action buttons
+ */
+
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 
+// Number of assets to fetch per page
 const PAGE_SIZE = 60;
 
+/**
+ * StockSelector Component
+ *
+ * @param {Object} props - Component props
+ * @param {Function} props.onAddAsset - Callback fired when user adds an asset to portfolio
+ * @returns {JSX.Element} Stock selector UI with search and filters
+ */
 function StockSelector({ onAddAsset }) {
   const apiBaseUrl = useMemo(() => import.meta.env.VITE_API_URL || '/api', []);
-  const [stocks, setStocks] = useState([]);
-  const [filteredStocks, setFilteredStocks] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [assetClassFilter, setAssetClassFilter] = useState('All');
-  const [sectorFilter, setSectorFilter] = useState('All');
-  const [assetClassOptions, setAssetClassOptions] = useState(['All']);
-  const [sectorOptions, setSectorOptions] = useState(['All']);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState(null);
-  const [totalCount, setTotalCount] = useState(0);
-  const [searchResult, setSearchResult] = useState(null);
-  const [searching, setSearching] = useState(false);
-  const [searchError, setSearchError] = useState(null);
 
+  // Asset data and filtering state
+  const [stocks, setStocks] = useState([]);                    // All loaded stocks from API
+  const [filteredStocks, setFilteredStocks] = useState([]);    // Client-side filtered results
+  const [searchTerm, setSearchTerm] = useState('');             // Search query string
+  const [assetClassFilter, setAssetClassFilter] = useState('All'); // Stock/ETF/Crypto filter
+  const [sectorFilter, setSectorFilter] = useState('All');      // Sector filter
+  const [assetClassOptions, setAssetClassOptions] = useState(['All']); // Available asset classes
+  const [sectorOptions, setSectorOptions] = useState(['All']);  // Available sectors
+
+  // Pagination state
+  const [page, setPage] = useState(1);                          // Current page number
+  const [hasMore, setHasMore] = useState(false);                // Whether more pages exist
+  const [totalCount, setTotalCount] = useState(0);              // Total asset count
+
+  // Loading and error state
+  const [loading, setLoading] = useState(true);                 // Initial load state
+  const [loadingMore, setLoadingMore] = useState(false);        // Pagination load state
+  const [error, setError] = useState(null);                     // Error messages
+
+  // Remote search state
+  const [searchResult, setSearchResult] = useState(null);       // Result from yfinance lookup
+  const [searching, setSearching] = useState(false);            // Remote search loading
+  const [searchError, setSearchError] = useState(null);         // Remote search errors
+
+  /**
+   * Fetches assets from the backend API with pagination and filtering.
+   * Can be called for initial load or "Load More" pagination.
+   *
+   * @param {number} pageToFetch - Page number to fetch (1-indexed)
+   * @param {boolean} replace - If true, replaces existing stocks; if false, appends
+   */
   const fetchStocks = useCallback(
     async (pageToFetch = 1, replace = false) => {
       if (pageToFetch === 1) {
@@ -72,10 +111,12 @@ function StockSelector({ onAddAsset }) {
     [apiBaseUrl, assetClassFilter, sectorFilter]
   );
 
+  // Fetch initial assets on mount and when filters change
   useEffect(() => {
     fetchStocks(1, true);
   }, [fetchStocks]);
 
+  // Client-side search filtering
   useEffect(() => {
     setSearchResult(null);
     setSearchError(null);
@@ -90,11 +131,23 @@ function StockSelector({ onAddAsset }) {
     setFilteredStocks(filtered);
   }, [searchTerm, stocks]);
 
+  /**
+   * Initiates drag operation when user starts dragging an asset.
+   *
+   * @param {DragEvent} e - Drag event
+   * @param {Object} stock - Stock data to transfer
+   */
   const handleDragStart = (e, stock) => {
     e.dataTransfer.setData('stock', JSON.stringify(stock));
     e.dataTransfer.effectAllowed = 'copy';
   };
 
+  /**
+   * Handles direct click-to-add action for an asset.
+   *
+   * @param {MouseEvent} e - Click event
+   * @param {Object} stock - Stock data to add
+   */
   const handleAddClick = (e, stock) => {
     e.stopPropagation();
     e.preventDefault();
@@ -103,12 +156,19 @@ function StockSelector({ onAddAsset }) {
     }
   };
 
+  /**
+   * Loads the next page of assets from the server.
+   */
   const handleLoadMore = () => {
     if (hasMore && !loadingMore) {
       fetchStocks(page + 1);
     }
   };
 
+  /**
+   * Searches for a ticker symbol via the backend's yfinance integration.
+   * This allows users to add assets not in the curated list.
+   */
   const handleRemoteSearch = async () => {
     if (!searchTerm.trim()) return;
     setSearching(true);
