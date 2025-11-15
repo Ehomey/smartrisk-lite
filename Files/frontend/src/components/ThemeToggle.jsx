@@ -1,3 +1,15 @@
+/**
+ * ThemeToggle.jsx
+ *
+ * Animated toggle button for switching between light and dark themes.
+ * Features smooth transitions, accessible ARIA attributes, and themed icons.
+ *
+ * @param {Object} props - Component props
+ * @param {string} props.theme - Current theme ('light' or 'dark')
+ * @param {Function} props.onToggle - Callback to toggle theme
+ * @returns {JSX.Element} Theme toggle button
+ */
+
 import React from 'react';
 
 function ThemeToggle({ theme, onToggle }) {

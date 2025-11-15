@@ -1,6 +1,32 @@
+/**
+ * ProjectionSlider.jsx
+ *
+ * Interactive slider component for exploring portfolio projections
+ * across different time horizons (1-10 years).
+ *
+ * Key Features:
+ * - Range slider for selecting investment horizon
+ * - Real-time display of percentile outcomes (P10/P50/P90)
+ * - Percentage return calculations
+ * - Visual warning for long-term projections (>5 years)
+ * - Always-visible disclaimer about projection uncertainty
+ */
+
 import React, { useState } from 'react';
 
+<<<<<<< HEAD
 function ProjectionSlider({ projections, contributionSettings }) {
+=======
+/**
+ * ProjectionSlider Component
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.projections - Projection data with percentile arrays
+ * @param {number} [props.initialInvestment=10000] - Starting portfolio value
+ * @returns {JSX.Element} Interactive projection slider
+ */
+function ProjectionSlider({ projections, initialInvestment = 10000 }) {
+>>>>>>> 0ad2c3ba15a78d7373b15e5b24fc1ee29d0d5dee
   const [selectedYear, setSelectedYear] = useState(5);
 
   if (!projections || !projections.percentiles) {

@@ -1,3 +1,17 @@
+/**
+ * AdvancedProjections.jsx
+ *
+ * Collapsible component displaying Monte Carlo simulation results
+ * as percentile bands over a 1-10 year time horizon.
+ *
+ * Key Features:
+ * - Interactive line chart showing P10, P50, P90, and Mean projections
+ * - Color-coded percentile bands (pessimistic, median, optimistic)
+ * - Expandable/collapsible interface to save screen space
+ * - Contextual explanations of percentile meanings
+ * - Historical CAGR reference for comparison
+ */
+
 import React, { useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
@@ -12,7 +26,7 @@ import {
   Filler
 } from 'chart.js';
 
-// Register Chart.js components
+// Register required Chart.js components for line chart rendering
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -24,7 +38,22 @@ ChartJS.register(
   Filler
 );
 
+<<<<<<< HEAD
 function AdvancedProjections({ projections, contributionSettings }) {
+=======
+/**
+ * AdvancedProjections Component
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.projections - Projection data from backend
+ * @param {number[]} props.projections.years - Array of year values (1-10)
+ * @param {Object} props.projections.percentiles - Percentile arrays (p10, p50, p90, mean)
+ * @param {number} props.projections.cagr - Historical compound annual growth rate
+ * @param {number} [props.initialInvestment=10000] - Starting portfolio value for tooltip calculations
+ * @returns {JSX.Element} Collapsible chart component
+ */
+function AdvancedProjections({ projections, initialInvestment = 10000 }) {
+>>>>>>> 0ad2c3ba15a78d7373b15e5b24fc1ee29d0d5dee
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!projections || !projections.percentiles) {

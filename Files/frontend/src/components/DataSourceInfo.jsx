@@ -1,3 +1,21 @@
+/**
+ * DataSourceInfo.jsx
+ *
+ * Displays data source provenance information for transparency.
+ * Shows which API (Yahoo Finance, Alpha Vantage) was used for each ticker,
+ * whether data was cached, and if fallback occurred.
+ *
+ * Key Features:
+ * - Groups tickers by data source
+ * - Color-coded badges (cached, fresh, fallback)
+ * - Visual indicators for cache status
+ * - Fallback warnings when rate limits are hit
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.dataSources - Map of ticker to source metadata
+ * @returns {JSX.Element|null} Data source information display
+ */
+
 import React from 'react';
 
 function DataSourceInfo({ dataSources }) {

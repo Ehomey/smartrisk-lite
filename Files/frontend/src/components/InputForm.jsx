@@ -1,5 +1,28 @@
+/**
+ * InputForm.jsx
+ *
+ * Legacy form-based portfolio input component (retained for backward compatibility).
+ * Allows manual ticker and weight entry via comma-separated text inputs.
+ *
+ * NOTE: This component is not actively used in the current drag-and-drop UI flow
+ * but remains available for users who prefer text-based input.
+ *
+ * Key Features:
+ * - Text input for tickers and weights
+ * - Comprehensive validation (format, sum, duplicates)
+ * - Data source selection (Yahoo Finance, Alpha Vantage)
+ * - Example portfolio loader
+ */
+
 import React, { useState } from 'react';
 
+/**
+ * InputForm Component
+ *
+ * @param {Object} props - Component props
+ * @param {Function} props.onSubmit - Callback when form is submitted with valid data
+ * @returns {JSX.Element} Form interface
+ */
 const InputForm = ({ onSubmit }) => {
     const [tickers, setTickers] = useState('AAPL,MSFT,GOOG');
     const [weights, setWeights] = useState('0.4,0.3,0.3');
@@ -7,14 +30,33 @@ const InputForm = ({ onSubmit }) => {
     const [apiKey, setApiKey] = useState('');
     const [validationError, setValidationError] = useState('');
 
+    /**
+     * Loads a pre-configured example portfolio for quick testing.
+     */
     const handleLoadExample = () => {
         setTickers('AAPL,MSFT,NVDA,TSLA');
         setWeights('0.3,0.3,0.2,0.2');
         setValidationError('');
     };
 
+    /**
+     * Validates portfolio input data against multiple criteria.
+     *
+     * Checks:
+     * - At least one ticker exists
+     * - Ticker and weight array lengths match
+     * - Ticker format (1-5 uppercase letters)
+     * - No negative weights
+     * - No weights exceeding 1.0
+     * - Weights sum to 1.0 (within tolerance)
+     * - API key provided if using Alpha Vantage
+     *
+     * @param {string[]} tickersArray - Array of ticker symbols
+     * @param {number[]} weightsArray - Array of portfolio weights
+     * @returns {string|null} Error message if validation fails, null if valid
+     */
     const validateInputs = (tickersArray, weightsArray) => {
-        // Check if arrays are empty
+        // Ensure at least one ticker is provided
         if (tickersArray.length === 0) {
             return "Please enter at least one ticker";
         }

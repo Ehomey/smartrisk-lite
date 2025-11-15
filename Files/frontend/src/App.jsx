@@ -1,3 +1,18 @@
+/**
+ * App.jsx
+ *
+ * Main application component for SmartRisk Lite portfolio analysis tool.
+ * Manages portfolio state, theme preferences, data source configuration,
+ * and orchestrates communication between child components.
+ *
+ * Key Features:
+ * - Drag-and-drop portfolio builder
+ * - Multi-source data fetching (Yahoo Finance, Alpha Vantage)
+ * - Monte Carlo simulations with configurable path counts
+ * - Dark mode theme toggle with localStorage persistence
+ * - Real-time portfolio analysis with comprehensive risk metrics
+ */
+
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import StockSelector from './components/StockSelector';
@@ -11,13 +26,25 @@ import DataSourceInfo from './components/DataSourceInfo';
 import ThemeToggle from './components/ThemeToggle';
 import AboutInsights from './components/AboutInsights';
 
+// Remote API endpoint for production deployment
 const REMOTE_API_FALLBACK = 'https://smartrisk-lite-production.up.railway.app';
+
+// Monte Carlo simulation path count options
 const SIMULATION_OPTIONS = [
     { label: '5k', value: 5000 },
     { label: '10k', value: 10000 },
     { label: '20k', value: 20000 },
 ];
 
+/**
+ * Determines the appropriate API base URL based on environment and hostname.
+ * Priority order:
+ * 1. VITE_API_URL environment variable
+ * 2. Local proxy (/api) for localhost development
+ * 3. Remote production API as fallback
+ *
+ * @returns {string} The API base URL
+ */
 const resolveApiBase = () => {
     const envUrl = import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim();
     if (envUrl) {
@@ -34,18 +61,38 @@ const resolveApiBase = () => {
     return REMOTE_API_FALLBACK;
 };
 
+/**
+ * Main App Component
+ *
+ * Manages the entire portfolio analysis workflow from asset selection
+ * through analysis and results visualization.
+ *
+ * @returns {JSX.Element} The main application UI
+ */
 function App() {
+    // Portfolio state: tickers and their corresponding weights
     const [portfolio, setPortfolio] = useState({ tickers: [], weights: [] });
+    // Analysis results from backend API
     const [portfolioData, setPortfolioData] = useState(null);
+    // Loading state for API requests
     const [loading, setLoading] = useState(false);
+    // Error messages for user feedback
     const [error, setError] = useState(null);
+    // Detailed loading status messages
     const [loadingMessage, setLoadingMessage] = useState('');
+    // Selected data source: 'yfinance' or 'alpha_vantage'
     const [dataSource, setDataSource] = useState('yfinance');
+    // Alpha Vantage API key (if using that data source)
     const [apiKey, setApiKey] = useState('');
+    // Number of Monte Carlo simulation paths (5k, 10k, or 20k)
     const [simulationPaths, setSimulationPaths] = useState(SIMULATION_OPTIONS[0].value);
+<<<<<<< HEAD
     const [initialInvestment, setInitialInvestment] = useState(10000);
     const [monthlyContribution, setMonthlyContribution] = useState(0);
     const [contributionFrequency, setContributionFrequency] = useState('monthly');
+=======
+    // Theme preference with localStorage persistence and system preference detection
+>>>>>>> 0ad2c3ba15a78d7373b15e5b24fc1ee29d0d5dee
     const [theme, setTheme] = useState(() => {
         if (typeof window !== 'undefined') {
             const storedTheme = window.localStorage.getItem('sr-theme');
@@ -69,8 +116,18 @@ function App() {
         }
     }, [theme]);
 
+    // Memoized API base URL (computed once on mount)
     const apiBaseUrl = useMemo(() => resolveApiBase(), []);
 
+    /**
+     * Analyzes a portfolio by sending tickers and weights to the backend API.
+     * Handles data source configuration, loading states, and error scenarios.
+     *
+     * @param {string[]} tickers - Array of stock ticker symbols
+     * @param {number[]} weights - Array of portfolio weights (must sum to 1.0)
+     * @param {string} dataSource - Data source to use ('yfinance' or 'alpha_vantage')
+     * @param {string} apiKey - API key for Alpha Vantage (if applicable)
+     */
     const analyzePortfolio = async (tickers, weights, dataSource, apiKey) => {
         setLoading(true);
         setError(null);
@@ -122,13 +179,22 @@ function App() {
         setLoadingMessage('');
     };
 
+    /**
+     * Toggles between light and dark theme modes.
+     * Theme preference is automatically persisted to localStorage.
+     */
     const toggleTheme = () => {
         setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
     };
 
-    // Portfolio management functions
+    /**
+     * Handles adding a new asset to the portfolio via drag-and-drop or click.
+     * Prevents duplicate tickers and automatically recalculates weights for equal distribution.
+     *
+     * @param {Object} stock - Stock object with ticker, name, assetClass, and sector
+     */
     const handleStockDrop = (stock) => {
-        // Check if stock already exists
+        // Prevent duplicate tickers in the portfolio
         if (portfolio.tickers.includes(stock.ticker)) {
             setError(`${stock.ticker} is already in your portfolio`);
             setTimeout(() => setError(null), 3000);
@@ -144,12 +210,24 @@ function App() {
         setError(null);
     };
 
+    /**
+     * Updates the weight of a specific asset in the portfolio.
+     *
+     * @param {number} index - Index of the asset to update
+     * @param {number} newWeight - New weight value (0.0 to 1.0)
+     */
     const handleWeightChange = (index, newWeight) => {
         const newWeights = [...portfolio.weights];
         newWeights[index] = newWeight;
         setPortfolio({ ...portfolio, weights: newWeights });
     };
 
+    /**
+     * Removes an asset from the portfolio and recalculates weights.
+     * If all assets are removed, resets the portfolio to empty state.
+     *
+     * @param {number} index - Index of the asset to remove
+     */
     const handleRemoveStock = (index) => {
         const newTickers = portfolio.tickers.filter((_, i) => i !== index);
 
@@ -163,6 +241,10 @@ function App() {
         }
     };
 
+    /**
+     * Validates portfolio configuration and triggers analysis.
+     * Ensures at least one asset exists and weights sum to 1.0 before proceeding.
+     */
     const handleAnalyze = () => {
         if (portfolio.tickers.length === 0) {
             setError('Please add at least one stock to your portfolio');

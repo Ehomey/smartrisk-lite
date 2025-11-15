@@ -1,3 +1,21 @@
+/**
+ * AboutInsights.jsx
+ *
+ * Expandable educational panel explaining key financial concepts
+ * and metrics used throughout the application.
+ *
+ * Provides plain-language definitions for:
+ * - Expected Return
+ * - Volatility
+ * - Sharpe Ratio
+ * - Monte Carlo Percentiles
+ * - Diversification
+ *
+ * Designed to help newer investors understand the analysis results.
+ *
+ * @returns {JSX.Element} Collapsible educational accordion
+ */
+
 import React, { useState } from "react";
 
 function AboutInsights() {
